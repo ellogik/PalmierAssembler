@@ -1,14 +1,17 @@
 #include "Lexer.hpp"
+#include <sstream>
+#include <stdexcept>
+#include <format>
 
 namespace Lexer {
-    Lexer::Lexer(std::string text) : text(std::move(text)) {
-    }
+    Lexer::Lexer(std::string text) : text(std::move(text)) {}
 
-    std::vector<std::vector<Token>> Lexer::tokenize() {
+    std::vector<std::vector<Token>> Lexer::tokenize() const
+    {
         std::vector<std::vector<Token>> tokens;
         std::vector<std::string> lines;
 
-        // Split text for lines
+        // Divide by lines
         {
             std::stringstream stream(text);
             std::string temp;
@@ -18,135 +21,109 @@ namespace Lexer {
             }
         }
 
-        uint for_position = 0; // Index for local for per char in line
+        // Every line validation
+        for (const auto& line : lines) {
+            std::vector<Token> tokens_per_line; // Tokens in current line
 
-        for( const auto& line : lines) {
-            std::vector<Token> tokens_per_line;
+            // Every char validation
+            for (size_t i = 0; i < line.size(); ++i) {
+                const char character = line[i];
 
-            for( const auto& character : line ) {
-                for_position++;
-                if( for_position < position_in_line ) continue;
-
-                // Checking is it special token
-                if( isalpha(character) ) {
-                    tokens_per_line.push_back(processIdentifier(line));
-                    continue;
-                }
-                if( isdigit(character) ) {
-                    tokens_per_line.push_back(processNumber(line));
+                // IDs validation
+                if (isalpha(character)) {
+                    tokens_per_line.push_back(processIdentifier(line, i));
                     continue;
                 }
 
+                // Digits validation
+                if (isdigit(character)) {
+                    tokens_per_line.push_back(processNumber(line, i));
+                    continue;
+                }
+
+                // Simple tokens validation
                 switch (processSimple(character, tokens_per_line)) {
-                    case 1: continue;
-                    case 2: goto continue_line;
-                    default:;
+                    case 1: continue; // Skip character
+                    case 2: goto skip_line; // Skip line
+                    default: break;
                 }
             }
 
-            tokens.push_back(tokens_per_line); // Add tokenized line to tokenized text
+            skip_line:; // For skipping current line
 
-            continue_line:; // For comments skips
-
-            // Set current index in line as 0
-            for_position = 0;
-            position_in_line = 0;
+            if(!tokens_per_line.empty())
+                tokens.push_back(tokens_per_line);
         }
 
         return tokens;
     }
 
-    Token Lexer::processIdentifier(const std::string &line) {
-        uint for_position = 0; // Index for local for
-        std::string buffer; // Here is line
+    Token Lexer::processIdentifier(const std::string& line, size_t& index)
+    {
+        std::string buffer;
 
-        for ( const auto& character : line ) {
-            // Skip to current position
-            {
-                for_position++;
-
-                if( for_position < position_in_line) continue;
-            }
-
-
-
-            position_in_line = for_position;
-
-            if( (isalpha(character) || isdigit(character) || character == '_') && character != ':' && character != ',' ) {
-                buffer += character; // Add character to buffer if it is digit or letter
-            } else {
-                if(character != ':' && character != ',') position_in_line++; // Skip to next char
-                break; // End searching identifier
-            }
+        while (index < line.size() && (isalnum(line[index]) || line[index] == '_')) {
+            buffer += line[index++];
         }
-
+        --index; // Minus because outer loop pluses index
 
         return Token{TokenType::IDENTIFIER, buffer};
     }
 
-    Token Lexer::processNumber(const std::string &line) {
-        uint for_position = 0; // Index for local for
-        std::string buffer; // Here is line
+    Token Lexer::processNumber(const std::string& line, size_t& index)
+    {
+        std::string buffer;
 
-        for ( const auto& character : line ) {
-            // Skip to current position
-            {
-                for_position++;
-
-                if( for_position < position_in_line) continue;
-            }
-
-            position_in_line = for_position;
-
-            if( isdigit(character) || character == '.' ) {
-                buffer += character; // Add character to buffer if it is digit or '.'
-            } else {
-                break; // End searching identifier
-            }
+        while (index < line.size() && (isdigit(line[index]) || line[index] == '.')) {
+            buffer += line[index++];
         }
+        --index; // Minus because outer loop pluses index
 
-        position_in_line++; // Skip to next char
-
-        return Token{TokenType::IDENTIFIER, buffer};
+        return Token{TokenType::NUMBER, buffer};
     }
 
-    short Lexer::processSimple(char character, std::vector<Token> &tokens_per_line) {
-        switch( character ) {
-            // Unnecessary things for compiler(only important for Programmers)
+    short Lexer::processSimple(char character, std::vector<Token>& tokens_per_line)
+    {
+        switch (character) {
+            // Useless things for compiler
             case ' ':
             case '\t':
             case '\r':
             case '\n':
-                position_in_line++;
-                return 1; // Code: Skip
+                return 1; // Skip whitespace
 
-            // Space for code
+            // Code space
             case '{':
-                tokens_per_line.push_back(Token {TokenType::LEFT_FIGURE_BRACKETS, ""});
+                tokens_per_line.push_back(Token{TokenType::LEFT_FIGURE_BRACKETS, ""});
                 break;
             case '}':
-                tokens_per_line.push_back(Token {TokenType::RIGHT_FIGURE_BRACKETS, ""});
+                tokens_per_line.push_back(Token{TokenType::RIGHT_FIGURE_BRACKETS, ""});
                 break;
 
+            // Command and args divider
             case ':':
-                tokens_per_line.push_back(Token {TokenType::VAR_AND_ARGS_DIVIDER, ""});
+                tokens_per_line.push_back(Token{TokenType::CMD_AND_ARGS_DIVIDER, ""});
                 break;
 
+            // Variables prefix
             case '%':
-                tokens_per_line.push_back(Token {TokenType::VAR_PREFIX, ""});
+                tokens_per_line.push_back(Token{TokenType::VAR_PREFIX, ""});
                 break;
 
+            // Args divider
             case ',':
-                tokens_per_line.push_back(Token {TokenType::ARGS_DIVIDER, ""});
+                tokens_per_line.push_back(Token{TokenType::ARGS_DIVIDER, ""});
                 break;
 
-            // Comments
+            // Comment
             case '/':
-                return 2; // Code: Comment
+                return 2; // Skip line(comment)
 
-            // Throw error if any unknown characters
-            default: throw std::invalid_argument(std::format("Invalid character: '{}'", character));
+
+            default:
+                throw std::invalid_argument(std::format("Invalid character: '{}'", character));
         }
+
 
         return 0;
     }

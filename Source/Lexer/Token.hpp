@@ -13,7 +13,7 @@ namespace Lexer {
         LEFT_FIGURE_BRACKETS,                             // Symbol: '{'
         RIGHT_FIGURE_BRACKETS,                            // Symbol: '}'
 
-        VAR_AND_ARGS_DIVIDER,                             // Symbol: ':'
+        CMD_AND_ARGS_DIVIDER,                             // Symbol: ':'
         VAR_PREFIX,                                       // Symbol: '%'
         ARGS_DIVIDER,                                     // Symbol: ','
 
