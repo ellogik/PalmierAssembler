@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace Lexer {
+namespace PalmierAssembler::Lexer {
 
     // For describe for what token
     enum class TokenType {
@@ -10,8 +10,8 @@ namespace Lexer {
         NUMBER,                                           // Number, example:  0, -13, 32, 561, 1000123
 
         // Figure brackets - {}
-        LEFT_FIGURE_BRACKETS,                             // Symbol: '{'
-        RIGHT_FIGURE_BRACKETS,                            // Symbol: '}'
+        START_CODE_SPACE,                             // Symbol: '{'
+        END_CODE_SPACE,                            // Symbol: '}'
 
         CMD_AND_ARGS_DIVIDER,                             // Symbol: ':'
         VAR_PREFIX,                                       // Symbol: '%'
@@ -20,13 +20,12 @@ namespace Lexer {
         COMMAND_MOVE,                                     // Command: 'move'
         COMMAND_SYSCALL,                                  // Command: 'syscall'
 
-        VARIABLE_SYSCALL_ID,                              // Variable: 'syscall_id'
-        VARIABLE_SYSCALL_ARG,                             // Variable: 'syscall_arg*'
+        KEYWORD_BLOCK,                                    // Keyword: 'block'
 
+        INVALID_TOKEN
     };
 
     struct Token {
-    public:
         TokenType type;
         std::string value;
     };

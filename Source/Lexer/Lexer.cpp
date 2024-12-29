@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <format>
 
-namespace Lexer {
+namespace PalmierAssembler::Lexer {
     Lexer::Lexer(std::string text) : text(std::move(text)) {}
 
     std::vector<std::vector<Token>> Lexer::tokenize() const
@@ -67,6 +67,10 @@ namespace Lexer {
         }
         --index; // Minus because outer loop pluses index
 
+        if(auto temp_keyword = processKeyword(buffer); temp_keyword.type != TokenType::INVALID_TOKEN )
+            return temp_keyword;
+
+
         return Token{TokenType::IDENTIFIER, buffer};
     }
 
@@ -82,6 +86,14 @@ namespace Lexer {
         return Token{TokenType::NUMBER, buffer};
     }
 
+    Token Lexer::processKeyword(const std::string& stroke) {
+        if(stroke == "block") return Token { TokenType::KEYWORD_BLOCK, "" };
+        if(stroke == "move") return Token { TokenType::COMMAND_MOVE, "" };
+        if(stroke == "syscall") return Token { TokenType::COMMAND_SYSCALL, "" };
+
+        return Token { TokenType::INVALID_TOKEN, "" };
+    }
+
     short Lexer::processSimple(char character, std::vector<Token>& tokens_per_line)
     {
         switch (character) {
@@ -94,10 +106,10 @@ namespace Lexer {
 
             // Code space
             case '{':
-                tokens_per_line.push_back(Token{TokenType::LEFT_FIGURE_BRACKETS, ""});
+                tokens_per_line.push_back(Token{TokenType::START_CODE_SPACE, ""});
                 break;
             case '}':
-                tokens_per_line.push_back(Token{TokenType::RIGHT_FIGURE_BRACKETS, ""});
+                tokens_per_line.push_back(Token{TokenType::END_CODE_SPACE, ""});
                 break;
 
             // Command and args divider

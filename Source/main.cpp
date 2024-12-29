@@ -1,6 +1,8 @@
 #include "Lexer/Lexer.hpp"
 #include <iostream>
 
+using namespace PalmierAssembler::Lexer;
+
 int main() {
     const auto txt = R"(
 / Only for UNIX;
@@ -11,7 +13,7 @@ block start {;
     syscall;                    / system call - exit(0);
 };
 )";
-    const auto lex = Lexer::Lexer(txt);
+    const auto lex = Lexer(txt);
 
     uint line_number = 0;
     for (const auto& tokens_per_line : lex.tokenize()) {
@@ -22,11 +24,15 @@ block start {;
             std::string type_str;
 
             switch (type) {
-                case Lexer::TokenType::LEFT_FIGURE_BRACKETS: type_str = "{"; break;
-                case Lexer::TokenType::RIGHT_FIGURE_BRACKETS: type_str = "}"; break;
-                case Lexer::TokenType::VAR_PREFIX: type_str = "%"; break;
-                case Lexer::TokenType::CMD_AND_ARGS_DIVIDER: type_str = ":"; break;
-                case Lexer::TokenType::ARGS_DIVIDER: type_str = ","; break;
+                case TokenType::START_CODE_SPACE: type_str = "{"; break;
+                case TokenType::END_CODE_SPACE: type_str = "}"; break;
+                case TokenType::VAR_PREFIX: type_str = "%"; break;
+                case TokenType::CMD_AND_ARGS_DIVIDER: type_str = ":"; break;
+                case TokenType::ARGS_DIVIDER: type_str = ","; break;
+                case TokenType::KEYWORD_BLOCK: type_str = "BLOCK"; break;
+                case TokenType::COMMAND_MOVE: type_str = "MOVE"; break;
+                case TokenType::COMMAND_SYSCALL: type_str = "SYSCALL"; break;
+
                 default: break;
             }
 

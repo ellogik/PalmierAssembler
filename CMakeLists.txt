@@ -10,4 +10,8 @@ add_executable(PalmierAssembler
     Source/Lexer/Lexer.hpp
     Source/Lexer/Lexer.cpp
     Source/Lexer/Token.hpp
+        Source/Parser/Nodes/ASTNode.hpp
+        Source/Parser/Nodes/BlockNode.hpp
+        Source/Parser/Parser.cpp
+        Source/Parser/Parser.hpp
 )

@@ -4,7 +4,7 @@
 #include <vector>
 #include "Token.hpp"
 
-namespace Lexer {
+namespace PalmierAssembler::Lexer {
 	class Lexer {
 	public:
 		explicit Lexer(std::string text);
@@ -15,8 +15,8 @@ namespace Lexer {
 		const std::string text;
 
 		static Token processIdentifier(const std::string& line, size_t& index);
-
 		static Token processNumber(const std::string& line, size_t& index);
+		static Token processKeyword(const std::string& stroke);
 
 		static short processSimple(char character, std::vector<Token>& tokens_per_line);
 	};
