@@ -5,7 +5,7 @@ block start {
 
         interrupt: 0x80;
     };
-    native: ARM64-BUILD-BLUGIN and DARWIN-O-MACH-BUILD-PLUGIN {
+    native: ARM64-BUILD-PLUGIN and DARWIN-O-MACH-BUILD-PLUGIN {
         // ...
     };
     native: notSupported {
