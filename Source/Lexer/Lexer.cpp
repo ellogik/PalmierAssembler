@@ -9,17 +9,7 @@ namespace PalmierAssembler::Lexer {
     std::vector<std::vector<Token>> Lexer::tokenize() const
     {
         std::vector<std::vector<Token>> tokens;
-        std::vector<std::string> lines;
-
-        // Divide by lines
-        {
-            std::stringstream stream(text);
-            std::string temp;
-
-            while (std::getline(stream, temp, ';')) {
-                lines.push_back(temp);
-            }
-        }
+        std::vector<std::string> lines = splitByDelims(text);
 
         // Every line validation
         for (const auto& line : lines) {
@@ -138,5 +128,31 @@ namespace PalmierAssembler::Lexer {
 
 
         return 0;
+    }
+
+    std::vector<std::string> Lexer::splitByDelims(const std::string &input) {
+        std::vector<std::string> result;
+        std::string current;
+        const std::string &delimiters = ";{}";
+
+        for (char c : input) {
+            if (delimiters.find(c) != std::string::npos) {
+                if (!current.empty()) {
+                    if (c == delimiters[1] || c == delimiters[2]) {
+                        current += c;
+                    } // This is hardcode, I'm sorry for this
+                    result.push_back(current);
+                    current.clear();
+                }
+            } else {
+                current += c;
+            }
+        }
+
+        if (!current.empty()) {
+            result.push_back(current);
+        }
+
+        return result;
     }
 }

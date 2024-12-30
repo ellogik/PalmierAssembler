@@ -1,8 +1,9 @@
-//
-// Created by svet on 12/30/24.
-//
+#pragma once
+#include "ASTNode.hpp"
 
-#ifndef SYSCALLCOMMANDNODE_HPP
-#define SYSCALLCOMMANDNODE_HPP
-
-#endif //SYSCALLCOMMANDNODE_HPP
+namespace PalmierAssembler::Parser::Nodes {
+    class SyscallCommandNode final : ASTNode {
+    public:
+        SyscallCommandNode() = default;
+    };
+}

@@ -19,5 +19,7 @@ namespace PalmierAssembler::Lexer {
 		static Token processKeyword(const std::string& stroke);
 
 		static short processSimple(char character, std::vector<Token>& tokens_per_line);
+
+		static std::vector<std::string> splitByDelims(const std::string& input);
 	};
 }

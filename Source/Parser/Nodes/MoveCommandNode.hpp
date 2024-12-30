@@ -1,8 +1,12 @@
-//
-// Created by svet on 12/30/24.
-//
+#pragma once
+#include "ASTNode.hpp"
 
-#ifndef MOVECOMMANDNODE_HPP
-#define MOVECOMMANDNODE_HPP
+namespace PalmierAssembler::Parser::Nodes {
+    class MoveCommandNode final : public ASTNode {
+    public:
+        ASTNode *receiver, *sender;
 
-#endif //MOVECOMMANDNODE_HPP
+        ~MoveCommandNode() override = default;
+    };
+}
+

@@ -14,4 +14,6 @@ add_executable(PalmierAssembler
         Source/Parser/Nodes/BlockNode.hpp
         Source/Parser/Parser.cpp
         Source/Parser/Parser.hpp
+        Source/Parser/Nodes/MoveCommandNode.hpp
+        Source/Parser/Nodes/SyscallCommandNode.hpp
 )

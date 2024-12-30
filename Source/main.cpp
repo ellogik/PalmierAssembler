@@ -1,22 +1,33 @@
 #include "Lexer/Lexer.hpp"
 #include <iostream>
 
+#include "Parser/Parser.hpp"
+
 using namespace PalmierAssembler::Lexer;
 
 int main() {
-    const auto txt = R"(
+    constexpr auto txt = R"(
 / Only for UNIX;
-block start {;
+block start {
     move: %syscall_id, 0;       / exit;
     move: %syscall_arg1, 0;     / 0;
 
     syscall;                    / system call - exit(0);
-};
+}
+block end {
+}
 )";
+
+
     const auto lex = Lexer(txt);
 
+
+    std::cout << "---------------LEXER---------------" << std::endl;
     uint line_number = 0;
-    for (const auto& tokens_per_line : lex.tokenize()) {
+
+    auto tokens = lex.tokenize();
+
+    for (const auto& tokens_per_line : tokens) {
         line_number++;
         std::cout << line_number << ") ";
 
@@ -41,6 +52,15 @@ block start {;
 
         std::cout << std::endl;
     }
+
+    std::cout << "---------------PARSER---------------" << std::endl;
+
+    auto prs = PalmierAssembler::Parser::Parser(tokens);
+
+    for (auto parsed = prs.parse(); auto ast_node : parsed) {
+        auto i = reinterpret_cast<PalmierAssembler::Parser::Nodes::BlockNode>(ast_node);
+    }
+
 
     return 0;
 }

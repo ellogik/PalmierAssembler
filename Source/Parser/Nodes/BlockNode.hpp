@@ -1,16 +1,18 @@
 #pragma once
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "ASTNode.hpp"
 
 namespace PalmierAssembler::Parser::Nodes {
-    struct BlockNode final : public ASTNode {
+    class BlockNode final : public ASTNode {
+    public:
         std::string name;
-        std::vector<ASTNode*> children;
+        std::vector<ASTNode> children;
 
-        ~BlockNode() override = default;
+        BlockNode(std::string name, const std::vector<ASTNode>& children) : name(std::move(name)), children(children) {}
     };
 }
 
