@@ -1,0 +1,8 @@
+//
+// Created by svet on 12/30/24.
+//
+
+#ifndef SYSCALLCOMMANDNODE_HPP
+#define SYSCALLCOMMANDNODE_HPP
+
+#endif //SYSCALLCOMMANDNODE_HPP
