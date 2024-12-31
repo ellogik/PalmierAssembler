@@ -2,7 +2,7 @@ mod lexerization;
 mod parsing;
 
 fn main() {
-    let mut lex = lexerization::Lexer::new(String::from("\
+    let txt = String::from("\
     / comment ;\
     block start {\
         move: %syscall_id, 0;\
@@ -13,8 +13,13 @@ fn main() {
     \
     block end {\
         syscall;\
-    }
-    "));
+    }");
+
+    let mut lex = lexerization::Lexer::new(txt.clone());
+
+    println!("----------------TEXT----------------");
+    println!("{txt:#?}");
+    println!("----------------LEXER----------------");
 
     let tokenized = lex.tokenize();
 
@@ -28,6 +33,8 @@ fn main() {
                 print!("\n")
             }
     );
+
+    println!("----------------PARSER----------------");
 
     let mut prs = parsing::Parser::new(tokenized);
 

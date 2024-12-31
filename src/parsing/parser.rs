@@ -2,7 +2,7 @@
 
 use crate::lexerization::{Token, TokenType};
 use crate::lexerization::TokenType::NUMBER;
-use crate::parsing::{BlockNode, InvalidNode, MoveCommandNode, NumberNode, NumberType, SyscallCommandNode, SyscallIdNode};
+use crate::parsing::{BlockNode, InvalidNode, MoveCommandNode, NumberNode, NumberType, SyscallArgNode, SyscallCommandNode, SyscallIdNode};
 use crate::parsing::nodes::ASTNode;
 
 pub struct Parser {
@@ -42,7 +42,7 @@ impl Parser {
                     }
 
                     _ => {
-
+                        // error
                     }
                 }
             }
@@ -101,7 +101,9 @@ impl Parser {
 
         let mut for_index: isize = 0;
 
-        for line in self.input.clone() {
+        let lines = self.input.clone();
+
+        for line in lines {
             if for_index < self.line_position { for_index += 1; continue }
 
             match line[0].token_type {
@@ -145,7 +147,7 @@ impl Parser {
 
             let args_token: Vec<Token> = line
                 .into_iter()
-                .skip_while(|token| token.token_type == TokenType::IDENTIFIER)
+                .skip_while(|token| token.token_type != TokenType::CMD_AND_ARGS_DIVIDER)
                 .skip(1)
                 .collect();
 
@@ -160,7 +162,6 @@ impl Parser {
             break
         };
 
-        self.line_position += 1;
 
         MoveCommandNode::new(node_receiver, node_value)
     }
@@ -173,14 +174,26 @@ impl Parser {
                         return Box::new(SyscallIdNode::new())
                     }
 
-                    _ => {}
+
+                    _ => {
+                        if expression[1].value.starts_with("syscall_arg") {
+                            if let Ok(num) = expression[1].value["syscall_arg".len()..].parse::<u8>() {
+                                return Box::new(SyscallArgNode::new(num));
+                            }
+                        }
+                    }
                 }
             } else {
                 // err
             }
         }
         if expression[0].token_type == NUMBER && expression.len() == 1 {
-            return Box::new(NumberNode::new(expression[0].clone().value, NumberType::INTEGER));
+            if expression[0].value.contains('.') {
+                return Box::new(NumberNode::new(expression[0].clone().value, NumberType::FLOAT))
+            }
+            else {
+                return Box::new(NumberNode::new(expression[0].clone().value, NumberType::INTEGER))
+            }
         }
 
         Box::new(InvalidNode::new())
