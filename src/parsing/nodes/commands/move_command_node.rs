@@ -1,5 +1,6 @@
 use crate::parsing::nodes::ASTNode;
 
+#[derive(Debug)]
 pub struct MoveCommandNode {
     receiver: Box<dyn ASTNode>,
     value: Box<dyn ASTNode>

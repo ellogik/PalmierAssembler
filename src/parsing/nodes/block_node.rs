@@ -1,5 +1,6 @@
 use crate::parsing::nodes::ast_node::ASTNode;
 
+#[derive(Debug)]
 pub struct BlockNode {
     pub name: String,
     pub children: Vec<Box<dyn ASTNode>>

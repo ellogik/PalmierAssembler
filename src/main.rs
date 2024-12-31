@@ -8,7 +8,12 @@ fn main() {
         move: %syscall_id, 0;\
         move: %syscall_arg1, 0;\
         syscall;\
+        syscall;\
     }\
+    \
+    block end {\
+        syscall;\
+    }
     "));
 
     let tokenized = lex.tokenize();
@@ -17,7 +22,7 @@ fn main() {
         |token|
             {
                 for tk in token {
-                    print!("{:?} ", tk.token_type);
+                    print!("{:#?} ", tk.token_type);
                 }
 
                 print!("\n")
@@ -27,5 +32,9 @@ fn main() {
     let mut prs = parsing::Parser::new(tokenized);
 
     let parsed = prs.parse();
+
+    parsed.iter().for_each(| node | {
+        println!("{:#?}", node);
+    })
 
 }

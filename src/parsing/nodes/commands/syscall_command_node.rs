@@ -1,6 +1,6 @@
 use crate::parsing::nodes::ASTNode;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct SyscallCommandNode {}
 
 impl ASTNode for SyscallCommandNode {}
