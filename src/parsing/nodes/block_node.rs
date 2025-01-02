@@ -6,7 +6,13 @@ pub struct BlockNode {
     pub children: Vec<Box<dyn ASTNode>>
 }
 
-impl ASTNode for BlockNode {}
+pub const BLOCK_ID: &str = "block";
+
+impl ASTNode for BlockNode {
+    fn id(&self) -> String {
+        BLOCK_ID.to_string()
+    }
+}
 
 impl BlockNode {
     pub fn new(name: String, children: Vec<Box<dyn ASTNode>>) -> Self {

@@ -6,7 +6,11 @@ pub struct MoveCommandNode {
     value: Box<dyn ASTNode>
 }
 
-impl ASTNode for MoveCommandNode {}
+impl ASTNode for MoveCommandNode {
+    fn id(&self) -> String {
+        "move".to_string()
+    }
+}
 
 impl MoveCommandNode {
     pub fn new(receiver: Box<dyn ASTNode>, value: Box<dyn ASTNode>) -> Self {

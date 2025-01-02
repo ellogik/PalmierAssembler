@@ -7,7 +7,8 @@ use std::fmt::{Display, Formatter};
 pub enum PluginError {
     CANNOT_RUN_PLUGIN_SCRIPT,
     WRONG_TYPE,
-    ERROR_WHILE_PARSE_COMMANDS
+    ERROR_WHILE_PARSE_COMMANDS,
+    ERROR_WHILE_PARSE_REGS,
 }
 
 impl Display for PluginError {

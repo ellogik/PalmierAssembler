@@ -6,7 +6,9 @@ pub struct GeneralRegNode {
 }
 
 impl ASTNode for GeneralRegNode {
-
+    fn id(&self) -> String {
+        format!("general_reg{}", self.label)
+    }
 }
 
 impl GeneralRegNode {

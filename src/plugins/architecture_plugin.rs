@@ -2,10 +2,10 @@
 #![allow(non_snake_case, dead_code, unreachable_code)]
 
 use std::collections::HashMap;
-use crate::parsing::{ASTNode, GeneralRegNode, InvalidNode};
+use crate::parsing::{ASTNode, GeneralRegNode, InvalidNode, MoveCommandNode, SyscallCommandNode};
 use crate::plugins::errors::PluginError;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Command {
     pub op_code: String,
     pub is_simple: bool,
@@ -19,33 +19,25 @@ impl Command {
         }
     }
 
-    pub fn from_string(from: String) -> Self {
+    pub fn fromString(from: String) -> Self {
         let splitted: Vec<&str> = from.split(",").collect();
-        let is_simple = match splitted[1] {
-            "true" => true,
-            "false" => false,
-            "0" => false,
-            "1" => true,
 
-            _ => false
-        };
-
-        Self::new(splitted[0].to_string(), is_simple)
+        Self::new(splitted[0].to_string(), parseBoolean(splitted[1]))
     }
 }
 
 pub struct ArchitecturePlugin {
     pub for_arch: String,
     pub path_to_python_script: String,
-    pub regs: HashMap<Box<dyn ASTNode>, String>,
-    pub commands: HashMap<Box<dyn ASTNode>, Command>
+    pub regs: HashMap<String, String>,
+    pub commands: HashMap<String, Command>
 }
 
 impl ArchitecturePlugin {
     fn new(for_arch: String,
            path_to_python_script: String,
-           regs: HashMap<Box<dyn ASTNode>, String>,
-           commands: HashMap<Box<dyn ASTNode>, Command>
+           regs: HashMap<String, String>,
+           commands: HashMap<String, Command>
     ) -> Self {
         Self {
             for_arch,
@@ -56,8 +48,8 @@ impl ArchitecturePlugin {
     }
 
     pub fn fromPythonScript(path_to_python_script: String) -> Result<Self, PluginError> {
-        let mut regs: HashMap<Box<dyn ASTNode>, String> = HashMap::new();
-        let mut commands: HashMap<Box<dyn ASTNode>, Command> = HashMap::new();
+        let mut regs: HashMap<String, String> = HashMap::new();
+        let mut commands: HashMap<String, Command> = HashMap::new();
         let mut for_arch: String = "".to_string();
 
         match std::process::Command::new("python3")
@@ -78,8 +70,8 @@ impl ArchitecturePlugin {
             }
         };
 
-        regs = Self::getAllRegsFromPythonScript(path_to_python_script.clone()).expect("FAIL::WHILE::GET_COMMANDS");
-
+        regs = Self::getAllRegsFromPythonScript(path_to_python_script.clone()).expect("FAIL::WHILE::GET_REGS");
+        commands = Self::getAllCommandsFromPythonScript(path_to_python_script.clone()).expect("FAIL::WHILE::GET_COMMANDS");
 
 
         Ok(Self::new(
@@ -90,12 +82,12 @@ impl ArchitecturePlugin {
         ))
     }
 
-    fn getAllRegsFromPythonScript(path_to_python_script: String) -> Result<HashMap<Box<dyn ASTNode>, String>, PluginError> {
-        let mut regs_ret: HashMap<Box<dyn ASTNode>, String> = HashMap::new();
-        let mut regs: HashMap<String, Box<dyn ASTNode>> = HashMap::new();
-
-        regs.insert("general_reg1".to_string(), Box::new(GeneralRegNode::new(1)));
-        regs.insert("general_reg2".to_string(), Box::new(GeneralRegNode::new(2)));
+    fn getAllRegsFromPythonScript(path_to_python_script: String) -> Result<HashMap<String, String>, PluginError> {
+        let mut regs_ret: HashMap<String, String> = HashMap::new();
+        let regs: Vec<Box<dyn ASTNode>> = vec![
+            Box::new(GeneralRegNode::new(1)),
+            Box::new(GeneralRegNode::new(2))
+        ];
 
 
 
@@ -103,20 +95,58 @@ impl ArchitecturePlugin {
             match std::process::Command::new("python3")
                 .arg(path_to_python_script.clone())
                 .arg("get_reg")
-                .arg("general_reg1")
+                .arg(reg.id())
                 .output() {
                     Ok(out) => {
                         let _out_of_script_raw: String = String::from_utf8(out.stdout).unwrap();
-
-                        regs_ret.insert(reg.1, _out_of_script_raw);
+                        regs_ret.insert(reg.id(), _out_of_script_raw.trim().to_string());
                     }
                     Err(err) => {
                         println!("Original error: {:?}", err);
-                        return Err(PluginError::ERROR_WHILE_PARSE_COMMANDS)
+                        return Err(PluginError::ERROR_WHILE_PARSE_REGS)
                     }
             }
         }
 
         Ok(regs_ret)
     }
+
+    fn getAllCommandsFromPythonScript(path_to_python_script: String) -> Result<HashMap<String, Command>, PluginError> {
+        let mut cmds_ret: HashMap<String, Command> = HashMap::new();
+
+        let cmds: Vec<Box<dyn ASTNode>> = vec![
+            Box::new(MoveCommandNode::new(
+                Box::new(InvalidNode::new()),
+                Box::new(InvalidNode::new())
+            )),
+            Box::new(SyscallCommandNode::new())
+        ];
+
+        for cmd in cmds {
+            match std::process::Command::new("python3")
+                .arg(path_to_python_script.clone())
+                .arg("get_cmd")
+                .arg(cmd.id())
+                .output() {
+                Ok(out) => {
+                    cmds_ret.insert(
+                        cmd.id(),
+                        Command::fromString(
+                            String::from_utf8(out.stdout).unwrap().to_string()
+                        )
+                    );
+                }
+                Err(err) => {
+                    println!("Original error: {:?}", err);
+                    return Err(PluginError::ERROR_WHILE_PARSE_COMMANDS)
+                }
+            }
+        }
+
+        Ok(cmds_ret)
+    }
+}
+
+fn parseBoolean(value: &str) -> bool {
+    matches!(value.trim(), "true" | "1")
 }

@@ -12,7 +12,11 @@ pub struct NumberNode {
     pub number_type: NumberType
 }
 
-impl ASTNode for NumberNode {}
+impl ASTNode for NumberNode {
+    fn id(&self) -> String {
+        "number".to_string()
+    }
+}
 
 impl NumberNode {
     pub fn new(value: String, number_type: NumberType) -> Self {

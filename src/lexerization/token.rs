@@ -11,6 +11,7 @@ pub enum TokenType {
 
     CMD_AND_ARGS_DIVIDER,                           // Symbol: ':'
     VAR_PREFIX,                                     // Symbol: '%'
+    REG_PREFIX,                                     // Symbol: '$'
     ARGS_DIVIDER,                                   // Symbol: ','
 
     CMD_MOVE,                                       // Command: 'move'
@@ -31,5 +32,5 @@ pub struct Token {
 }
 
 impl Token {
-    pub fn new(token_type: TokenType, value: String) -> Token { Self {token_type, value } }
+    pub fn new(token_type: TokenType, value: String) -> Token { Self { token_type, value } }
 }

@@ -2,14 +2,13 @@
 
 use crate::lexerization::{Token, TokenType};
 use crate::lexerization::TokenType::NUMBER;
-use crate::parsing::{BlockNode, InvalidNode, MoveCommandNode, NumberNode, NumberType, SyscallArgNode, SyscallCommandNode, SyscallIdNode};
+use crate::parsing::{BlockNode, GeneralRegNode, InvalidNode, MoveCommandNode, NumberNode, NumberType, SyscallArgNode, SyscallCommandNode, SyscallIdNode};
 use crate::parsing::errors::UnknownCommandError;
 use crate::parsing::nodes::ASTNode;
 
 pub struct Parser {
     input: Vec<Vec<Token>>,
     line_position: usize,
-
 
     pub top_layer_nodes: Vec<Box<dyn ASTNode>>
 }
@@ -181,7 +180,7 @@ impl Parser {
     }
 
     fn parseExpression(&mut self, expression: Vec<Token>) -> Box<dyn ASTNode> {
-        if expression[0].token_type == TokenType::VAR_PREFIX {
+        if expression[0].token_type == TokenType::VAR_PREFIX || expression[0].token_type == TokenType::REG_PREFIX {
             if expression[1].token_type == TokenType::IDENTIFIER {
                 match expression[1].value.as_str() {
                     "syscall_id" => {
@@ -192,6 +191,11 @@ impl Parser {
                         if expression[1].value.starts_with("syscall_arg") {
                             if let Ok(num) = expression[1].value["syscall_arg".len()..].parse::<u8>() {
                                 return Box::new(SyscallArgNode::new(num));
+                            }
+                        }
+                        if expression[1].value.starts_with("general_reg") {
+                            if let Ok(num) = expression[1].value["general_reg".len()..].parse::<u8>() {
+                                return Box::new(GeneralRegNode::new(num));
                             }
                         }
                     }

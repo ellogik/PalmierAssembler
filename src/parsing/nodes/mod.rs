@@ -4,8 +4,8 @@ mod commands;
 mod invalid_node;
 mod types;
 
-pub use ast_node::ASTNode;
-pub use block_node::BlockNode;
+pub use ast_node::*;
+pub use block_node::*;
 pub use commands::*;
 pub use invalid_node::*;
 pub use types::*;

@@ -1,5 +1,8 @@
 #![allow(dead_code)]
 
+use std::fs;
+use crate::lexerization::Lexer;
+use crate::parsing::Parser;
 use crate::plugins::ArchitecturePlugin;
 
 mod lexerization;
@@ -8,8 +11,12 @@ mod native_code_generation;
 mod plugins;
 
 fn main() {
-    let i = ArchitecturePlugin::fromPythonScript("examples/plugins/x86-64.py".to_string()).expect("FAIL");
+    let _txt = fs::read_to_string("examples/projects/basic.plmr.pasm").expect("FAIL::TXT");
 
-    println!("{}", i.for_arch)
+    let mut _lexer = Lexer::new(_txt);
 
+    let mut parser = Parser::new(_lexer.tokenize());
+
+
+    println!("{:#?}", parser.parse());
 }

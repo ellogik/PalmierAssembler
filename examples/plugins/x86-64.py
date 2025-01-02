@@ -38,7 +38,7 @@ NATIVE_COMMANDS = {
         "is_simple": False,
     },
     "syscall": {
-        "opcode": "0F 05",
+        "opcode": "0x0F 0x05",
         "is_simple": True,
     }
 }

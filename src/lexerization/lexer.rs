@@ -169,6 +169,7 @@ impl Lexer {
             ':' => TokenType::CMD_AND_ARGS_DIVIDER,
             ',' => TokenType::ARGS_DIVIDER,
             '%' => TokenType::VAR_PREFIX,
+            '$' => TokenType::REG_PREFIX,
 
             _ => INVALID_TOKEN // Handle other characters here if necessary
         }
