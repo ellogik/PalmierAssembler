@@ -22,6 +22,8 @@ pub enum TokenType {
     INVALID_TOKEN
 }
 
+
+
 #[derive(Debug, Clone)]
 pub struct Token {
     pub token_type: TokenType,
@@ -29,5 +31,5 @@ pub struct Token {
 }
 
 impl Token {
-    pub fn new(token_type: TokenType, value: String) -> Token { Self {token_type: token_type, value: value} }
+    pub fn new(token_type: TokenType, value: String) -> Token { Self {token_type, value } }
 }

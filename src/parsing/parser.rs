@@ -1,13 +1,14 @@
-#![allow(dead_code, non_snake_case)]
+#![allow(dead_code, non_snake_case, unused_variables, unused)]
 
 use crate::lexerization::{Token, TokenType};
 use crate::lexerization::TokenType::NUMBER;
 use crate::parsing::{BlockNode, InvalidNode, MoveCommandNode, NumberNode, NumberType, SyscallArgNode, SyscallCommandNode, SyscallIdNode};
+use crate::parsing::errors::UnknownCommandError;
 use crate::parsing::nodes::ASTNode;
 
 pub struct Parser {
     input: Vec<Vec<Token>>,
-    line_position: isize,
+    line_position: usize,
 
 
     pub top_layer_nodes: Vec<Box<dyn ASTNode>>
@@ -25,7 +26,7 @@ impl Parser {
 
     pub fn parse(&mut self) -> &Vec<Box<dyn ASTNode>>
     {
-        let mut for_index: isize = 0;
+        let mut for_index: usize = 0;
 
         for line in self.input.clone() {
             if for_index < self.line_position { for_index += 1; continue }
@@ -58,7 +59,7 @@ impl Parser {
         let mut name = String::new();
         let mut nodes_in: Vec<Box<dyn ASTNode>> = Vec::new();
 
-        let mut for_index: isize = 0;
+        let mut for_index: usize = 0;
 
         'LINE_MARK: for line in self.input.clone() {
             if for_index < self.line_position {
@@ -83,7 +84,14 @@ impl Parser {
                     for_index += 1;
                     is_name_before = false;
 
-                    nodes_in = self.parseCommands();
+                    match self.parseCommands() {
+                        Ok(ok) => {nodes_in = ok}
+                        Err(e) => {
+                            println!("{}", e);
+
+                            break 'LINE_MARK;
+                        }
+                    }
 
                     break 'LINE_MARK
                 }
@@ -96,17 +104,17 @@ impl Parser {
         BlockNode::new(name, nodes_in)
     }
 
-    fn parseCommands(&mut self) -> Vec<Box<dyn ASTNode>> {
+    fn parseCommands(&mut self) -> Result<Vec<Box<dyn ASTNode>>, UnknownCommandError> {
         let mut nodes: Vec<Box<dyn ASTNode>> = Vec::new();
 
-        let mut for_index: isize = 0;
+        let mut for_index: usize = 0;
 
         let lines = self.input.clone();
 
         for line in lines {
             if for_index < self.line_position { for_index += 1; continue }
 
-            match line[0].token_type {
+            match &line[0].token_type {
                 TokenType::CMD_MOVE => {
                     let i= self.parseMoveCommand();
                     nodes.push(Box::new(i))
@@ -119,8 +127,14 @@ impl Parser {
                     break
                 }
 
-                _ => {
-                    println!("Expected command or macro call in line {}", for_index + 1)
+                _e => {
+                    return Err(
+                        UnknownCommandError::new(
+                            String::from("main.plmr.pasm"),
+                            self.line_position,
+                            line[0].value.clone()
+                        )
+                    )
                 }
             }
 
@@ -128,14 +142,14 @@ impl Parser {
             self.line_position += 1;
         }
 
-        nodes
+        Ok(nodes)
     }
 
     fn parseMoveCommand(&mut self) -> MoveCommandNode {
         let mut node_receiver: Box<dyn ASTNode> = Box::new(InvalidNode::new());
         let mut node_value: Box<dyn ASTNode> = Box::new(InvalidNode::new());
 
-        let mut for_index: isize = 0;
+        let mut for_index: usize = 0;
 
         for line in self.input.clone() {
             if for_index < self.line_position { for_index += 1; continue }
@@ -174,7 +188,6 @@ impl Parser {
                         return Box::new(SyscallIdNode::new())
                     }
 
-
                     _ => {
                         if expression[1].value.starts_with("syscall_arg") {
                             if let Ok(num) = expression[1].value["syscall_arg".len()..].parse::<u8>() {
@@ -188,11 +201,10 @@ impl Parser {
             }
         }
         if expression[0].token_type == NUMBER && expression.len() == 1 {
-            if expression[0].value.contains('.') {
-                return Box::new(NumberNode::new(expression[0].clone().value, NumberType::FLOAT))
-            }
-            else {
-                return Box::new(NumberNode::new(expression[0].clone().value, NumberType::INTEGER))
+            return if expression[0].value.contains('.') {
+                Box::new(NumberNode::new(expression[0].clone().value, NumberType::FLOAT))
+            } else {
+                Box::new(NumberNode::new(expression[0].clone().value, NumberType::INTEGER))
             }
         }
 
