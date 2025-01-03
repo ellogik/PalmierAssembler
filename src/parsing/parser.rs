@@ -23,7 +23,7 @@ impl Parser {
         }
     }
 
-    pub fn parse(&mut self) -> &Vec<Box<dyn ASTNode>>
+    pub fn parse(&mut self)
     {
         let mut for_index: usize = 0;
 
@@ -50,8 +50,6 @@ impl Parser {
             self.line_position += 1;
             for_index += 1;
         }
-
-        &self.top_layer_nodes
     }
 
     fn parseBlock(&mut self) -> BlockNode {

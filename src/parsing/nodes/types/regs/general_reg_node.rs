@@ -1,3 +1,4 @@
+use std::any::Any;
 use crate::parsing::ASTNode;
 
 #[derive(Clone, Debug)]
@@ -8,6 +9,10 @@ pub struct GeneralRegNode {
 impl ASTNode for GeneralRegNode {
     fn id(&self) -> String {
         format!("general_reg{}", self.label)
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 

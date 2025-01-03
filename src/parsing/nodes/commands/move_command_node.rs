@@ -1,3 +1,4 @@
+use std::any::Any;
 use crate::parsing::nodes::ASTNode;
 
 #[derive(Debug)]
@@ -9,6 +10,10 @@ pub struct MoveCommandNode {
 impl ASTNode for MoveCommandNode {
     fn id(&self) -> String {
         "move".to_string()
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 

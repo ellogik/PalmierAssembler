@@ -1,3 +1,4 @@
+use std::any::Any;
 use crate::parsing::ASTNode;
 
 #[derive(Debug, Clone)]
@@ -8,6 +9,10 @@ pub struct SyscallArgNode{
 impl ASTNode for SyscallArgNode {
     fn id(&self) -> String {
         format!("syscall-arg{}", self.label)
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 

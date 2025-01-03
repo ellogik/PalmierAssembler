@@ -1,3 +1,4 @@
+use std::any::Any;
 use crate::parsing::nodes::ast_node::ASTNode;
 
 #[derive(Debug)]
@@ -11,6 +12,10 @@ pub const BLOCK_ID: &str = "block";
 impl ASTNode for BlockNode {
     fn id(&self) -> String {
         BLOCK_ID.to_string()
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 
