@@ -1,5 +1,7 @@
+import plugins.architectures.ArchX86_64
 import plugins.packages.elf.*
-import utils.byte_order.LittleEndianThings
+import utils.typing.EAppType
+import utils.typing.EOperatingSystem
 
 /*
 import lexicalization.ETokenType
@@ -23,23 +25,7 @@ fun main() {
     val e_phoff = ELF_HEADER_SIZE + (PROGRAM_HEADER_SIZE * numProgramHeaders)
     val e_shoff = e_phoff + (PROGRAM_HEADER_SIZE * numProgramHeaders) + (SECTION_HEADER_SIZE * numSectionHeaders)
 
-    val header = DELFHeader(
-        clazz = EELFClass.ELF64,
-        format_of_data = LittleEndianThings.ELF_ID,
-        abi = EELFAbi.LINUX,
-        type = EELFType.EXECUTABLE,
-        machine = EELFMachine.X86,
-        entry = PackerELF.code_start_point.toLong(),
-        bias_to_ph = e_phoff.toLong(),
-        bias_to_sh = e_shoff.toLong(),
-        flags = 0,
-        header_size = ELF_HEADER_SIZE.toShort(),
-        phs_size = PROGRAM_HEADER_SIZE.toShort(),
-        num_of_phs = numProgramHeaders.toShort(),
-        sh_size = SECTION_HEADER_SIZE.toShort(),
-        num_of_sections = numSectionHeaders.toShort(),
-        index_of_section_with_string_and_names = 0
-    )
+    val header = DELFHeader.fromStuff(ArchX86_64, EOperatingSystem.LINUX, EAppType.EXECUTABLE)
 
     println(header.toByteArray())
 

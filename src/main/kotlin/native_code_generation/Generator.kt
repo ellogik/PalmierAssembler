@@ -12,7 +12,7 @@ class Generator(
     private val input: List<AASTNode>
 ) {
     private var output: MutableList<UInt> = mutableListOf()
-    private var current_address: ULong = packer.code_start_point
+    private var current_address: ULong = architecture.ELF_REQUIREMENTS!!.ENTRY
     private var blocks: MutableMap<String, ULong> = mutableMapOf()
 
     fun compile(): List<UInt> {
