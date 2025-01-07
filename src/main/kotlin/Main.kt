@@ -1,35 +1,15 @@
-import plugins.architectures.ArchX86_64
-import plugins.packages.elf.*
-import utils.typing.EAppType
-import utils.typing.EOperatingSystem
-
-/*
+import native_code_generation.helpers.architectures.ArchX86_64
 import lexicalization.ETokenType
 import lexicalization.Lexer
 import native_code_generation.Generator
+import native_code_generation.helpers.packages.elf.PackerELF
 import parsing.Parser
-import plugins.architectures.ArchX86_64
-import plugins.packages.elf.PackerELF
+import utils.typing.EAppType
+import utils.typing.EOperatingSystem
 import java.nio.file.Files
 import java.nio.file.Paths
-*/
+
 fun main() {
-
-    val ELF_HEADER_SIZE = 64
-    val PROGRAM_HEADER_SIZE = 56
-    val SECTION_HEADER_SIZE = 40
-
-    val numProgramHeaders = 3
-    val numSectionHeaders = 5
-
-    val e_phoff = ELF_HEADER_SIZE + (PROGRAM_HEADER_SIZE * numProgramHeaders)
-    val e_shoff = e_phoff + (PROGRAM_HEADER_SIZE * numProgramHeaders) + (SECTION_HEADER_SIZE * numSectionHeaders)
-
-    val header = DELFHeader.fromStuff(ArchX86_64, EOperatingSystem.LINUX, EAppType.EXECUTABLE)
-
-    println(header.toByteArray())
-
-    /*
     val currentDir = Paths.get("").toAbsolutePath()
     val filePath = currentDir.resolve("examples/projects/base.plmr.pasm")
     var source = ""
@@ -76,13 +56,15 @@ fun main() {
     println(parsed)
 
     println("--------------------CODE_GENERATOR--------------------")
-    val current_arch = ArchX86_64()
-    val current_packer = PackerELF()
+    val current_arch = ArchX86_64
+    val current_packer = PackerELF
+    val current_os = EOperatingSystem.LINUX
 
     val code_gen = Generator(current_arch, current_packer, parsed)
     val compiled = code_gen.compile()
+    println(compiled)
 
-    println(current_packer.pack(compiled))
-
-    */
+    println("--------------------ELF_TEST--------------------")
+    current_packer.setSettings(current_arch, current_os, EAppType.STATIC_LIBRARY)
+    current_packer.pack(compiled)
 }

@@ -1,13 +1,13 @@
-package plugins
+package native_code_generation.helpers
 
+import native_code_generation.helpers.packages.elf.DELFRequirementsToArchitecture
 import parsing.nodes.commands.DMoveCommandNode
-import plugins.packages.elf.DELFRequirementsToArchitecture
 import utils.byte_order.EByteOrder
 import utils.typing.EArchitecture
 import utils.typing.EBitType
 import java.lang.reflect.Type
 
-abstract class AArchitecturePlugin : IPlugin {
+abstract class AArchitecture {
     abstract val FOR_ARCH: EArchitecture
     abstract val ELF_REQUIREMENTS: DELFRequirementsToArchitecture?
     abstract val BYTE_ORDER: EByteOrder

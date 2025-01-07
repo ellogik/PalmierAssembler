@@ -3,8 +3,6 @@ package utils.byte_order
 import java.math.BigInteger
 
 object LittleEndianThings {
-    const val ELF_ID: Byte = 0x01 // Little-endian
-
     fun toLittleEndian32(value: Int): List<UInt> {
         val byte1 = (value and 0xFF).toUInt()
         val byte2 = ((value shr 8) and 0xFF).toUInt()

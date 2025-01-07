@@ -1,4 +1,0 @@
-package plugins
-
-interface IPlugin {
-}

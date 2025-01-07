@@ -1,6 +1,6 @@
-package plugins.packages.elf
+package native_code_generation.helpers.packages.elf
 
-import plugins.AArchitecturePlugin
+import native_code_generation.helpers.AArchitecture
 import utils.byte_order.EByteOrder
 import utils.errors.DInvalidArgumentError
 import utils.typing.EAppType
@@ -8,7 +8,6 @@ import utils.typing.EArchitecture
 import utils.typing.EBitType
 import utils.typing.EOperatingSystem
 import java.nio.ByteBuffer
-import java.nio.ByteOrder
 
 data class DELFHeader(
     val clazz: UByte,
@@ -21,7 +20,7 @@ data class DELFHeader(
     val bias_to_sh: ULong,
     val flags: UInt,
     val header_size: UShort,
-    val phs_size: UShort,
+    val ph_size: UShort,
     val num_of_phs: UShort,
     val sh_size: UShort,
     val num_of_sections: UShort,
@@ -31,17 +30,17 @@ data class DELFHeader(
         val ELF_MAGIC: ByteArray = byteArrayOf(0x7F, 0x45, 0x4C, 0x46) // Magic number
         const val VERSION: Byte = 0x01 // ELF version
 
-        fun fromStuff(arch: AArchitecturePlugin, os: EOperatingSystem, app_type: EAppType): DELFHeader {
-            if( !os.isSupportELF() ) throw DInvalidArgumentError("OS '$os' not supports ELF")
-            if( arch.ELF_REQUIREMENTS == null ) throw DInvalidArgumentError("${arch.FOR_ARCH} is not implements ELF things")
+        fun fromStuff(arch: AArchitecture, os: EOperatingSystem, app_type: EAppType): DELFHeader {
+            if( !os.isSupportELF() ) throw DInvalidArgumentError("OS '$os' doesn't support ELF")
+            if( arch.ELF_REQUIREMENTS == null ) throw DInvalidArgumentError("${arch.FOR_ARCH} doesn't implement ELF things")
 
-            val b_to_ph = (arch.ELF_REQUIREMENTS!!.HEADER_SIZE + (arch.ELF_REQUIREMENTS!!.PROGRAM_HEADER_SIZE * PackerELF.NUM_PROGRAM_HEADERS)).toULong()
+            val b_to_ph = (arch.BITS_TYPE.toELFHeaderSize() + (arch.BITS_TYPE.toELFProgramHeaderSize() * PackerELF.NUM_PROGRAM_HEADERS)).toULong()
             val b_to_sh = b_to_ph +
-                    (arch.ELF_REQUIREMENTS!!.PROGRAM_HEADER_SIZE * PackerELF.NUM_PROGRAM_HEADERS) +
-                    (arch.ELF_REQUIREMENTS!!.SECTION_HEADER_SIZE * PackerELF.NUM_SECTION_HEADERS)
+                    (arch.BITS_TYPE.toELFProgramHeaderSize() * PackerELF.NUM_PROGRAM_HEADERS) +
+                    (arch.BITS_TYPE.toELFSectionHeaderSize() * PackerELF.NUM_SECTION_HEADERS)
 
             return DELFHeader(
-                clazz = arch.BITS_TYPE.toELFArch(),
+                clazz = arch.BITS_TYPE.toELF(),
                 format_of_data = arch.BYTE_ORDER.toELF(),
                 abi = os.toELFAbi(),
                 type = app_type.toELF(),
@@ -50,9 +49,9 @@ data class DELFHeader(
                 bias_to_ph = b_to_ph,
                 bias_to_sh = b_to_sh,
                 flags = 0u,
-                header_size = arch.ELF_REQUIREMENTS!!.HEADER_SIZE,
-                phs_size = arch.ELF_REQUIREMENTS!!.PROGRAM_HEADER_SIZE,
-                sh_size = arch.ELF_REQUIREMENTS!!.SECTION_HEADER_SIZE,
+                header_size = arch.BITS_TYPE.toELFHeaderSize(),
+                ph_size = arch.BITS_TYPE.toELFProgramHeaderSize(),
+                sh_size = arch.BITS_TYPE.toELFSectionHeaderSize(),
                 num_of_sections = PackerELF.NUM_SECTION_HEADERS,
                 num_of_phs = PackerELF.NUM_PROGRAM_HEADERS,
                 index_of_section_with_string_and_names = 0u
@@ -61,12 +60,13 @@ data class DELFHeader(
     }
 
     // Function for listing header
-    fun toByteArray(): List<Byte> {
-        var byte_order = ByteOrder.LITTLE_ENDIAN
-        val byte: UByte = 0x01u // little endian
-        if (format_of_data != byte) byte_order = ByteOrder.BIG_ENDIAN
+    fun toByteArray(arch: AArchitecture): List<Byte> {
+        if(arch.ELF_REQUIREMENTS == null)
+            throw DInvalidArgumentError("Can't build ELF Header.'${arch.FOR_ARCH}' don't implement ELF")
 
-        val buffer = ByteBuffer.allocate(64).order(byte_order)
+        val buffer = ByteBuffer
+            .allocate(arch.BITS_TYPE.toELFSectionHeaderSize().toInt())
+            .order(arch.BYTE_ORDER.toJavaByteOrder())
 
         // e_ident
         buffer.put(ELF_MAGIC) // Magic
@@ -85,7 +85,7 @@ data class DELFHeader(
         buffer.putLong(bias_to_sh.toLong()) // Bias to headers of sections
         buffer.putInt(flags.toInt()) // Flags
         buffer.putShort(header_size.toShort()) // Size of ELF Header
-        buffer.putShort(phs_size.toShort()) // Size of PHs
+        buffer.putShort(ph_size.toShort()) // Size of PHs
         buffer.putShort(num_of_phs.toShort()) // Num of PHs
         buffer.putShort(sh_size.toShort()) // Size of sections headers
         buffer.putShort(num_of_sections.toShort()) // Num of sections
@@ -95,10 +95,19 @@ data class DELFHeader(
     }
 }
 
-fun EBitType.toELFArch(): UByte {
+fun EBitType.toELF(): UByte {
     return when(this) {
         EBitType.X32 -> 0x01u
         EBitType.X64 -> 0x02u
+
+        else -> throw DInvalidArgumentError("'$this' is not supports ELF format")
+    }
+}
+
+fun EBitType.toELFHeaderSize(): UShort {
+    return when(this) {
+        EBitType.X32 -> 52u
+        EBitType.X64 -> 64u
 
         else -> throw DInvalidArgumentError("'$this' is not supports ELF format")
     }

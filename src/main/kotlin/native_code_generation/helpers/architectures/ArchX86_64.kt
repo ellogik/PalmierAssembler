@@ -1,25 +1,22 @@
-package plugins.architectures
+package native_code_generation.helpers.architectures
 
 import parsing.nodes.AASTNode
 import parsing.nodes.commands.DMoveCommandNode
 import parsing.nodes.commands.DSystemCallCommandNode
 import parsing.nodes.expressions.DIntegerNode
 import parsing.nodes.regs_and_vars.DGeneralRegNode
-import plugins.AArchitecturePlugin
-import plugins.packages.elf.DELFRequirementsToArchitecture
+import native_code_generation.helpers.AArchitecture
+import native_code_generation.helpers.packages.elf.DELFRequirementsToArchitecture
 import utils.byte_order.EByteOrder
 import utils.byte_order.LittleEndianThings
 import utils.typing.EArchitecture
 import utils.typing.EBitType
 import java.lang.reflect.Type
 
-object ArchX86_64 : AArchitecturePlugin() {
+object ArchX86_64 : AArchitecture() {
     override val FOR_ARCH: EArchitecture = EArchitecture.X86_64
     override val ELF_REQUIREMENTS: DELFRequirementsToArchitecture = DELFRequirementsToArchitecture(
-        SECTION_HEADER_SIZE = 40u,
-        PROGRAM_HEADER_SIZE = 56u,
-        ENTRY = 0x400000u,
-        HEADER_SIZE = 64u
+        ENTRY = 0x400000u
     )
     override val BITS_TYPE: EBitType = EBitType.X64
     override val BYTE_ORDER: EByteOrder = EByteOrder.LITTLE_ENDIAN
