@@ -2,7 +2,6 @@ import native_code_generation.helpers.architectures.ArchX86_64
 import lexicalization.ETokenType
 import lexicalization.Lexer
 import native_code_generation.Generator
-import native_code_generation.helpers.packages.elf.PackerELF
 import parsing.Parser
 import utils.typing.EAppType
 import utils.typing.EOperatingSystem
@@ -57,14 +56,14 @@ fun main() {
 
     println("--------------------CODE_GENERATOR--------------------")
     val current_arch = ArchX86_64
-    val current_packer = PackerELF
+//    val current_packer = PackerELF
     val current_os = EOperatingSystem.LINUX
 
-    val code_gen = Generator(current_arch, current_packer, parsed)
+    val code_gen = Generator(current_arch, parsed)
     val compiled = code_gen.compile()
     println(compiled)
 
     println("--------------------ELF_TEST--------------------")
-    current_packer.setSettings(current_arch, current_os, EAppType.STATIC_LIBRARY)
-    current_packer.pack(compiled)
+//    current_packer.setSettings(current_arch, current_os, EAppType.EXECUTABLE)
+//    current_packer.pack(compiled)
 }

@@ -4,11 +4,9 @@ import parsing.nodes.AASTNode
 import parsing.nodes.base.DBlockNode
 import parsing.nodes.commands.DMoveCommandNode
 import native_code_generation.helpers.AArchitecture
-import native_code_generation.helpers.APacker
 
 class Generator(
     private val architecture: AArchitecture,
-    packer: APacker,
     private val input: List<AASTNode>
 ) {
     private var output: MutableList<UInt> = mutableListOf()

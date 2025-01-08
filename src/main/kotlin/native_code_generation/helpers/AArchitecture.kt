@@ -1,6 +1,5 @@
 package native_code_generation.helpers
 
-import native_code_generation.helpers.packages.elf.DELFRequirementsToArchitecture
 import parsing.nodes.commands.DMoveCommandNode
 import utils.byte_order.EByteOrder
 import utils.typing.EArchitecture

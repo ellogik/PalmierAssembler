@@ -6,7 +6,6 @@ import parsing.nodes.commands.DSystemCallCommandNode
 import parsing.nodes.expressions.DIntegerNode
 import parsing.nodes.regs_and_vars.DGeneralRegNode
 import native_code_generation.helpers.AArchitecture
-import native_code_generation.helpers.packages.elf.DELFRequirementsToArchitecture
 import utils.byte_order.EByteOrder
 import utils.byte_order.LittleEndianThings
 import utils.typing.EArchitecture
