@@ -33,3 +33,4 @@ build/
 
 ### User Content ###
 do_not_add_to_git
+*.elf
