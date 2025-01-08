@@ -22,11 +22,4 @@ enum class EOperatingSystem {
             else -> throw RuntimeException("Unknown Operating System '$from'")
         }
     }
-
-    fun isSupportELF(): Boolean {
-        return when (this){
-            LINUX -> true
-            else -> false
-        }
-    }
 }

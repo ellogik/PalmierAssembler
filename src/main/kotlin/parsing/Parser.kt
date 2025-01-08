@@ -9,7 +9,7 @@ import parsing.nodes.commands.DSystemCallCommandNode
 import parsing.nodes.expressions.DIntegerNode
 import parsing.nodes.regs_and_vars.DGeneralRegNode
 
-class Parser(private val input: MutableList<MutableList<DToken>>) {
+class Parser(private val input: List<List<DToken>>) {
     private val parsed: MutableList<AASTNode> = mutableListOf()
     private var current_line_index = 0
 
