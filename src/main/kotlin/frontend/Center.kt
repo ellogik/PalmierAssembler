@@ -33,7 +33,7 @@ object Center {
     private fun parse() { PARSED = Parser(TOKENS).parse() }
     private fun compile()  { NATIVE_CODE = Generator( CURRENT_ARCHITECTURE, PARSED ).compile() }
     private fun pack() {
-        CURRENT_PACKER.setSettings(CURRENT_ARCHITECTURE, CURRENT_OS);
+        CURRENT_PACKER.setSettings(CURRENT_ARCHITECTURE, CURRENT_OS)
         PACKED_CODE = CURRENT_PACKER.pack(NATIVE_CODE)
     }
 }

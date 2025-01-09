@@ -1,6 +1,11 @@
 package native_code_generation.helpers.packages.elf.elf64
 
 import native_code_generation.helpers.AArchitecture
+import native_code_generation.helpers.packages.elf.elf64.PackerELF64.ARCH
+import native_code_generation.helpers.packages.elf.elf64.PackerELF64.HEADER_SIZE
+import native_code_generation.helpers.packages.elf.elf64.PackerELF64.OS
+import native_code_generation.helpers.packages.elf.elf64.PackerELF64.PROGRAM_HEADER_SIZE
+import native_code_generation.helpers.packages.elf.elf64.PackerELF64.SECTION_HEADER_SIZE
 import utils.errors.DInvalidArgumentError
 import utils.typing.EOperatingSystem
 import java.nio.ByteBuffer
@@ -28,34 +33,27 @@ data class DELF64Header(
     companion object {
         val PADDING: ByteArray = ByteArray(7)
         val MAGIC: ByteArray = byteArrayOf(0x7F.toByte(), 'E'.code.toByte(), 'L'.code.toByte(), 'F'.code.toByte())
-        const val HEADER_SIZE: Short = 64
-        const val PROGRAM_HEADER_SIZE: Short = 56
-        const val SECTION_HEADER_SIZE: Short = 40
-        private lateinit var ARCH: AArchitecture
 
-        fun fromStuff(arch: AArchitecture, os: EOperatingSystem): DELF64Header {
-            ARCH = arch
-            return DELF64Header(
-                class_type = 2, // ELF64
-                endianness = arch.BYTE_ORDER.toELF(),
-                elf_version = 1, // current
-                os_abi = os.toELFAbi(),
-                abi_version = 0, // none
-                type = 1, // relocatable
-                machine = arch.toELF(),
-                version = 1, // current
-                entry = if(arch.ELF_ENTRY != null) arch.ELF_ENTRY!! else throw DInvalidArgumentError("$arch not implemented ELF"),
-                ph_offset = HEADER_SIZE.toLong(),
-                sh_offset = (HEADER_SIZE + PackerELF64.num_of_phs * PROGRAM_HEADER_SIZE).toLong(),
-                flags = 0,
-                eh_size = HEADER_SIZE,
-                ph_entry_size = PROGRAM_HEADER_SIZE,
-                ph_count = PackerELF64.num_of_phs,
-                sh_entry_size = SECTION_HEADER_SIZE,
-                sh_count = PackerELF64.num_of_shs,
-                sh_str_index = (PackerELF64.num_of_shs - 1).toShort()
-            )
-        }
+        fun fromStuff() = DELF64Header(
+            class_type = 2, // ELF64
+            endianness = ARCH.BYTE_ORDER.toELF(),
+            elf_version = 1, // current
+            os_abi = OS.toELFAbi(),
+            abi_version = 0, // none
+            type = 2, // relocatable
+            machine = ARCH.toELF(),
+            version = 1, // current
+            entry = if(ARCH.ELF_ENTRY != null) ARCH.ELF_ENTRY!! else throw DInvalidArgumentError("$ARCH doesn't implement ELF"),
+            ph_offset = HEADER_SIZE.toLong(),
+            sh_offset = (HEADER_SIZE + PackerELF64.num_of_phs * PROGRAM_HEADER_SIZE).toLong(),
+            flags = 0,
+            eh_size = HEADER_SIZE,
+            ph_entry_size = PROGRAM_HEADER_SIZE,
+            ph_count = PackerELF64.num_of_phs,
+            sh_entry_size = SECTION_HEADER_SIZE,
+            sh_count = PackerELF64.num_of_shs,
+            sh_str_index = (PackerELF64.num_of_shs - 1).toShort()
+        )
     }
 
     fun toByteArray(): ByteArray {

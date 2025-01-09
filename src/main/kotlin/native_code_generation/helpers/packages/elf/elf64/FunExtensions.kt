@@ -6,11 +6,6 @@ import utils.byte_order.EByteOrder
 import utils.errors.DInvalidArgumentError
 import utils.typing.EOperatingSystem
 
-fun EOperatingSystem.isSupportELF(): Boolean =  when (this){
-    EOperatingSystem.LINUX -> true
-    else -> false
-}
-
 fun EByteOrder.toELF(): Byte = when(this) {
     EByteOrder.LITTLE_ENDIAN -> 1
     EByteOrder.BIG_ENDIAN -> 2

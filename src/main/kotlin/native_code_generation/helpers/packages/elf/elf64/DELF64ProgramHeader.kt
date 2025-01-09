@@ -1,7 +1,8 @@
 package native_code_generation.helpers.packages.elf.elf64
 
-import native_code_generation.helpers.AArchitecture
-import native_code_generation.helpers.packages.elf.elf64.DELF64Header.Companion.HEADER_SIZE
+import native_code_generation.helpers.packages.elf.elf64.PackerELF64.ARCH
+import native_code_generation.helpers.packages.elf.elf64.PackerELF64.HEADER_SIZE
+import native_code_generation.helpers.packages.elf.elf64.PackerELF64.PROGRAM_HEADER_SIZE
 import java.nio.ByteBuffer
 
 data class DELF64ProgramHeader(
@@ -15,11 +16,20 @@ data class DELF64ProgramHeader(
     val align: Long
 ) {
     companion object {
-        lateinit var ARCH: AArchitecture
+        fun forText(size: Long) = DELF64ProgramHeader(
+            type = 1, // LOAD
+            access_flags = 5, // READ + EXEC,
+            offset = 0x1000L,
+            virtual_address = ARCH.ELF_ENTRY!! + 0x1000L,
+            physical_address = 0,
+            in_file_size = size,
+            in_memory_size = size,
+            align = 0x1000L
+        )
     }
 
     fun toByteArray(): ByteArray {
-        val buffer = ByteBuffer.allocate(HEADER_SIZE.toInt()).order(ARCH.BYTE_ORDER.toJavaByteOrder())
+        val buffer = ByteBuffer.allocate(PROGRAM_HEADER_SIZE.toInt()).order(ARCH.BYTE_ORDER.toJavaByteOrder())
 
         buffer.putInt(type)
         buffer.putInt(access_flags)

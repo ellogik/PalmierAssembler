@@ -27,8 +27,6 @@ class Generator(
             }
         }
 
-        print(output)
-
         return output
     }
 

@@ -1,15 +1,14 @@
 package utils.byte_order
 
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+
 fun List<UInt>.toByteArrayLittleEndian(): ByteArray {
-    val byteArray = ByteArray(this.size * UInt.SIZE_BYTES)
-    for (i in this.indices) {
-        val value = this[i]
-        byteArray[i * 4] = value.toByte()
-        byteArray[i * 4 + 1] = (value shr 8).toByte()
-        byteArray[i * 4 + 2] = (value shr 16).toByte()
-        byteArray[i * 4 + 3] = (value shr 24).toByte()
+    val buffer = ByteBuffer.allocate(this.size * 4).order(ByteOrder.LITTLE_ENDIAN) // 4 байта для каждого UInt
+    for (item in this) {
+        buffer.putInt(item.toInt())
     }
-    return byteArray
+    return buffer.array()
 }
 
 fun Int.toLittleEndian(): List<UInt> {
