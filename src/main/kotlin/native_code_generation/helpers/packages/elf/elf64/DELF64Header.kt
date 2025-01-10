@@ -52,7 +52,7 @@ data class DELF64Header(
             ph_count = PackerELF64.num_of_phs,
             sh_entry_size = SECTION_HEADER_SIZE,
             sh_count = PackerELF64.num_of_shs,
-            sh_str_index = (PackerELF64.num_of_shs - 1).toShort()
+            sh_str_index = 1
         )
     }
 

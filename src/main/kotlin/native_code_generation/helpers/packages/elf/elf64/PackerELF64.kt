@@ -29,11 +29,6 @@ object PackerELF64 : APacker() {
         val text_section_header_bin = DELF64SectionHeader.forText(size).toByteArray()
         val shstrtab_data = byteArrayOf(
             0,            // \0
-            't'.code.toByte(),
-            'e'.code.toByte(),
-            'x'.code.toByte(),
-            't'.code.toByte(),
-            0,            // \0 (завершающий нулевой байт для ".text")
             's'.code.toByte(),
             'h'.code.toByte(),
             's'.code.toByte(),
@@ -42,15 +37,22 @@ object PackerELF64 : APacker() {
             't'.code.toByte(),
             'a'.code.toByte(),
             'b'.code.toByte(),
-            0             // \0 (завершающий нулевой байт для ".shstrtab")
+            0,             // \0 (завершающий нулевой байт для ".shstrtab")
+            't'.code.toByte(),
+            'e'.code.toByte(),
+            'x'.code.toByte(),
+            't'.code.toByte(),
+            0
         )
-        val shstrtab_bin = DELF64SectionHeader.forShStrTab((shstrtab_data.size * Byte.SIZE_BYTES).toLong()).toByteArray()
 
-        println("Original executable code: $executable_code")
-        println("On ByteArray(LE): ${executable_code.toByteArrayLittleEndian().toList()}")
+        val shstrtab_bin = DELF64SectionHeader.forShStrTab((shstrtab_data.size).toLong()).toByteArray()
 
-
-        val obj = header_bin + text_program_header_bin + text_section_header_bin + executable_code.toByteArrayLittleEndian() + shstrtab_bin + shstrtab_data
+        val obj = header_bin +
+                text_program_header_bin +
+                text_section_header_bin +
+                executable_code.map { it.toByte() } +
+                shstrtab_bin +
+                shstrtab_data
 
 
         return obj

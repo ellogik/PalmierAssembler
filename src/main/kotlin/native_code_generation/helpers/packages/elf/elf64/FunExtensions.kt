@@ -5,6 +5,8 @@ import native_code_generation.helpers.architectures.ArchX86_64
 import utils.byte_order.EByteOrder
 import utils.errors.DInvalidArgumentError
 import utils.typing.EOperatingSystem
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 fun EByteOrder.toELF(): Byte = when(this) {
     EByteOrder.LITTLE_ENDIAN -> 1
@@ -19,4 +21,12 @@ fun EOperatingSystem.toELFAbi(): Byte = when(this) {
 fun AArchitecture.toELF(): Short = when(this) {
     is ArchX86_64 -> 0x3E // x86-64
     else -> throw DInvalidArgumentError("ELF or PASM not supported '$this' architecture")
+}
+
+fun Long.toByteBuffer(endian: EByteOrder): ByteBuffer {
+    val buffer = ByteBuffer.allocate(8).order(endian.toJavaByteOrder())
+
+    buffer.putLong(this)
+
+    return buffer
 }
