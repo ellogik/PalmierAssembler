@@ -30,3 +30,11 @@ fun Long.toByteBuffer(endian: EByteOrder): ByteBuffer {
 
     return buffer
 }
+
+fun Int.toByteBuffer(endian: EByteOrder): ByteBuffer {
+    val buffer = ByteBuffer.allocate(4).order(endian.toJavaByteOrder())
+
+    buffer.putInt(this)
+
+    return buffer
+}

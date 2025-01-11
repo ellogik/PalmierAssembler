@@ -6,6 +6,8 @@ import native_code_generation.helpers.packages.elf.elf64.PackerELF64.HEADER_SIZE
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.OS
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.PROGRAM_HEADER_SIZE
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.SECTION_HEADER_SIZE
+import native_code_generation.helpers.packages.elf.elf64.PackerELF64.num_of_phs
+import native_code_generation.helpers.packages.elf.elf64.PackerELF64.num_of_shs
 import utils.errors.DInvalidArgumentError
 import utils.typing.EOperatingSystem
 import java.nio.ByteBuffer
@@ -28,7 +30,7 @@ data class DELF64Header(
     val ph_count: Short = 1, // Number of program headers
     val sh_entry_size: Short = SECTION_HEADER_SIZE, // Section header entry size
     val sh_count: Short = 0, // Number of sections
-    val sh_str_index: Short = 0 // Section header string table index
+    val sh_str_index: Short = (num_of_shs - 1).toShort() // Section header string table index
 ) {
     companion object {
         val PADDING: ByteArray = ByteArray(7)
@@ -40,19 +42,19 @@ data class DELF64Header(
             elf_version = 1, // current
             os_abi = OS.toELFAbi(),
             abi_version = 0, // none
-            type = 2, // relocatable
+            type = 1, // relocatable
             machine = ARCH.toELF(),
             version = 1, // current
             entry = if(ARCH.ELF_ENTRY != null) ARCH.ELF_ENTRY!! else throw DInvalidArgumentError("$ARCH doesn't implement ELF"),
             ph_offset = HEADER_SIZE.toLong(),
-            sh_offset = (HEADER_SIZE + PackerELF64.num_of_phs * PROGRAM_HEADER_SIZE).toLong(),
+            sh_offset = (HEADER_SIZE + num_of_phs * PROGRAM_HEADER_SIZE).toLong(),
             flags = 0,
             eh_size = HEADER_SIZE,
             ph_entry_size = PROGRAM_HEADER_SIZE,
-            ph_count = PackerELF64.num_of_phs,
+            ph_count = num_of_phs,
             sh_entry_size = SECTION_HEADER_SIZE,
-            sh_count = PackerELF64.num_of_shs,
-            sh_str_index = 1
+            sh_count = num_of_shs,
+            sh_str_index = (num_of_shs - 2).toShort()
         )
     }
 

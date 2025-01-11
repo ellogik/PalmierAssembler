@@ -2,12 +2,11 @@ package native_code_generation.helpers.packages.elf.elf64
 
 import native_code_generation.helpers.AArchitecture
 import native_code_generation.helpers.APacker
-import utils.byte_order.toByteArrayLittleEndian
 import utils.typing.EOperatingSystem
 
 object PackerELF64 : APacker() {
     var num_of_phs: Short = 1
-    var num_of_shs: Short = 2
+    var num_of_shs: Short = 3
     const val HEADER_SIZE: Short = 64
     const val PROGRAM_HEADER_SIZE: Short = 56
     const val SECTION_HEADER_SIZE: Short = 64
@@ -45,13 +44,15 @@ object PackerELF64 : APacker() {
             0
         )
 
-        val shstrtab_bin = DELF64SectionHeader.forShStrTab((shstrtab_data.size).toLong()).toByteArray()
+        val shstrtab_section_header_bin = DELF64SectionHeader.forShStrTab(15).toByteArray()
+        val end_of_elf_data_section_header_bin = DELF64SectionHeader.forNull().toByteArray()
 
         val obj = header_bin +
                 text_program_header_bin +
                 text_section_header_bin +
+                shstrtab_section_header_bin +
+                end_of_elf_data_section_header_bin +
                 executable_code.map { it.toByte() } +
-                shstrtab_bin +
                 shstrtab_data
 
 

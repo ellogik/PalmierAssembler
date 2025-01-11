@@ -21,15 +21,21 @@ data class DELF64SectionHeader(
 ) {
     companion object {
         private var DOT_TEXT_SIZE: Long? = null
+        private var DOT_SH_STR_TAB_SIZE: Long? = null
 
         fun forText(size: Long): DELF64SectionHeader {
             DOT_TEXT_SIZE = size
+
             return DELF64SectionHeader(
                 name = 10, //.text
                 type = 1, // progbits
                 flags = 0x6, // SHF_ALLOC | SHF_EXECINSTR
                 address = ARCH.ELF_ENTRY!! + 0x1000L,
-                offset = (HEADER_SIZE + (PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs) + SECTION_HEADER_SIZE).toLong(),
+                offset = (
+                        HEADER_SIZE +
+                                (PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs) +
+                                (SECTION_HEADER_SIZE * PackerELF64.num_of_phs)
+                        ).toLong(),
                 size = size,
                 link = 0,
                 info = 0,
@@ -37,36 +43,56 @@ data class DELF64SectionHeader(
                 entry_size = 0
             )
         }
-        fun forShStrTab(size: Long) = DELF64SectionHeader(
-            name = 1, //.shstrtab
-            type = 0x3, // SHT_STRTAB
-            flags = 0x20,
-            address = 0x100,
-            offset = (HEADER_SIZE +
-                    (PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs) +
-                    (SECTION_HEADER_SIZE * PackerELF64.num_of_shs) +
-                    DOT_TEXT_SIZE!!),
-            size = size,
+        fun forShStrTab(size: Long): DELF64SectionHeader {
+            DOT_SH_STR_TAB_SIZE = size
+
+            return DELF64SectionHeader(
+                name = 1, //.shstrtab
+                type = 0x3, // SHT_STRTAB
+                flags = 0,
+                address = 0,
+                offset = HEADER_SIZE +
+                            (PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs) +
+                            (SECTION_HEADER_SIZE * PackerELF64.num_of_phs) +
+                            DOT_TEXT_SIZE!!,
+                size = size,
+                link = 0,
+                info = 0,
+                address_align = 2,
+                entry_size = 0
+            )
+        }
+
+        fun forNull() = DELF64SectionHeader (
+            name = 0,
+            type = 0,
+            flags = 0,
+            address = 0,
+            offset = 0,
+            size = 0,
             link = 0,
             info = 0,
-            address_align = 1,
+            address_align = 2,
             entry_size = 0
         )
     }
 
+
     fun toByteArray(): ByteArray {
         val buffer = ByteBuffer.allocate(SECTION_HEADER_SIZE.toInt()).order(ARCH.BYTE_ORDER.toJavaByteOrder())
 
-        buffer.putInt(name)
-        buffer.putInt(type)
-        buffer.put(flags.toByteBuffer(ARCH.BYTE_ORDER))
-        buffer.put(address.toByteBuffer(ARCH.BYTE_ORDER))
-        buffer.put(offset.toByteBuffer(ARCH.BYTE_ORDER))
-        buffer.put(size.toByteBuffer(ARCH.BYTE_ORDER))
-        buffer.putInt(link)
-        buffer.putInt(info)
-        buffer.put(address_align.toByteBuffer(ARCH.BYTE_ORDER))
-        buffer.put(entry_size.toByteBuffer(ARCH.BYTE_ORDER))
+        buffer.put(name.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(type.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(flags.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(address.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(offset.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(size.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(link.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(info.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(address_align.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(entry_size.toByteBuffer(ARCH.BYTE_ORDER).array())
+
+        println(buffer.array().toList())
 
         return buffer.array()
     }
