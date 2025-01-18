@@ -6,7 +6,7 @@ import utils.typing.EOperatingSystem
 
 object PackerELF64 : APacker() {
     var num_of_phs: Short = 1
-    var num_of_shs: Short = 3
+    var num_of_shs: Short = 2
     const val HEADER_SIZE: Short = 64
     const val PROGRAM_HEADER_SIZE: Short = 56
     const val SECTION_HEADER_SIZE: Short = 64
@@ -20,7 +20,7 @@ object PackerELF64 : APacker() {
     }
 
     override fun pack(executable_code: List<UInt>): ByteArray {
-        val size = (executable_code.size * UInt.SIZE_BYTES).toLong()
+        val size = (executable_code.size).toLong()
         val header_bin = DELF64Header.fromStuff().toByteArray()
         val text_program_header_bin = DELF64ProgramHeader.forText(
             size
@@ -36,7 +36,7 @@ object PackerELF64 : APacker() {
             't'.code.toByte(),
             'a'.code.toByte(),
             'b'.code.toByte(),
-            0,             // \0 (завершающий нулевой байт для ".shstrtab")
+            0,
             't'.code.toByte(),
             'e'.code.toByte(),
             'x'.code.toByte(),
@@ -44,14 +44,12 @@ object PackerELF64 : APacker() {
             0
         )
 
-        val shstrtab_section_header_bin = DELF64SectionHeader.forShStrTab(15).toByteArray()
-        val end_of_elf_data_section_header_bin = DELF64SectionHeader.forNull().toByteArray()
+        val shstrtab_section_header_bin = DELF64SectionHeader.forShStrTab(shstrtab_data.size.toLong()).toByteArray()
 
         val obj = header_bin +
                 text_program_header_bin +
                 text_section_header_bin +
                 shstrtab_section_header_bin +
-                end_of_elf_data_section_header_bin +
                 executable_code.map { it.toByte() } +
                 shstrtab_data
 

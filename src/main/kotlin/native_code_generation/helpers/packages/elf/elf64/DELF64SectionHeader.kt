@@ -6,6 +6,7 @@ import native_code_generation.helpers.packages.elf.elf64.PackerELF64.PROGRAM_HEA
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.SECTION_HEADER_SIZE
 import utils.byte_order.EByteOrder
 import java.nio.ByteBuffer
+import kotlin.concurrent.timer
 
 data class DELF64SectionHeader(
     val name: Int,
@@ -34,9 +35,9 @@ data class DELF64SectionHeader(
                 offset = (
                         HEADER_SIZE +
                                 (PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs) +
-                                (SECTION_HEADER_SIZE * PackerELF64.num_of_phs)
+                                (SECTION_HEADER_SIZE * PackerELF64.num_of_shs)
                         ).toLong(),
-                size = size,
+                size = size * UInt.SIZE_BYTES,
                 link = 0,
                 info = 0,
                 address_align = 0x1000,
@@ -49,12 +50,11 @@ data class DELF64SectionHeader(
             return DELF64SectionHeader(
                 name = 1, //.shstrtab
                 type = 0x3, // SHT_STRTAB
-                flags = 0,
+                flags = 0x20,
                 address = 0,
                 offset = HEADER_SIZE +
                             (PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs) +
-                            (SECTION_HEADER_SIZE * PackerELF64.num_of_phs) +
-                            DOT_TEXT_SIZE!!,
+                            (SECTION_HEADER_SIZE * PackerELF64.num_of_shs) + DOT_TEXT_SIZE!!.toLong(),
                 size = size,
                 link = 0,
                 info = 0,
@@ -62,19 +62,6 @@ data class DELF64SectionHeader(
                 entry_size = 0
             )
         }
-
-        fun forNull() = DELF64SectionHeader (
-            name = 0,
-            type = 0,
-            flags = 0,
-            address = 0,
-            offset = 0,
-            size = 0,
-            link = 0,
-            info = 0,
-            address_align = 2,
-            entry_size = 0
-        )
     }
 
 

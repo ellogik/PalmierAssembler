@@ -42,7 +42,7 @@ data class DELF64Header(
             elf_version = 1, // current
             os_abi = OS.toELFAbi(),
             abi_version = 0, // none
-            type = 1, // relocatable
+            type = 2, // exec
             machine = ARCH.toELF(),
             version = 1, // current
             entry = if(ARCH.ELF_ENTRY != null) ARCH.ELF_ENTRY!! else throw DInvalidArgumentError("$ARCH doesn't implement ELF"),
@@ -54,7 +54,7 @@ data class DELF64Header(
             ph_count = num_of_phs,
             sh_entry_size = SECTION_HEADER_SIZE,
             sh_count = num_of_shs,
-            sh_str_index = (num_of_shs - 2).toShort()
+            sh_str_index = (num_of_shs - 1).toShort() // last
         )
     }
 
