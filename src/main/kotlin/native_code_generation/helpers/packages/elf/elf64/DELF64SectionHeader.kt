@@ -55,7 +55,7 @@ data class DELF64SectionHeader(
                 offset = HEADER_SIZE +
                             (PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs) +
                             (SECTION_HEADER_SIZE * PackerELF64.num_of_shs) + DOT_TEXT_SIZE!!.toLong(),
-                size = size,
+                size = size * Byte.SIZE_BYTES,
                 link = 0,
                 info = 0,
                 address_align = 2,
@@ -78,8 +78,6 @@ data class DELF64SectionHeader(
         buffer.put(info.toByteBuffer(ARCH.BYTE_ORDER).array())
         buffer.put(address_align.toByteBuffer(ARCH.BYTE_ORDER).array())
         buffer.put(entry_size.toByteBuffer(ARCH.BYTE_ORDER).array())
-
-        println(buffer.array().toList())
 
         return buffer.array()
     }

@@ -42,7 +42,7 @@ data class DELF64Header(
             elf_version = 1, // current
             os_abi = OS.toELFAbi(),
             abi_version = 0, // none
-            type = 2, // exec
+            type = 1, // exec
             machine = ARCH.toELF(),
             version = 1, // current
             entry = if(ARCH.ELF_ENTRY != null) ARCH.ELF_ENTRY!! else throw DInvalidArgumentError("$ARCH doesn't implement ELF"),

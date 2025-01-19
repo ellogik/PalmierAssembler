@@ -44,7 +44,9 @@ object PackerELF64 : APacker() {
             0
         )
 
-        val shstrtab_section_header_bin = DELF64SectionHeader.forShStrTab(shstrtab_data.size.toLong()).toByteArray()
+        val shstrtab_section_header_bin = DELF64SectionHeader.forShStrTab(
+            shstrtab_data.size.toLong()
+        ).toByteArray()
 
         val obj = header_bin +
                 text_program_header_bin +
