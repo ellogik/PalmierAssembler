@@ -3,6 +3,7 @@ package native_code_generation.helpers.packages.elf.elf64
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.ARCH
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.HEADER_SIZE
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.PROGRAM_HEADER_SIZE
+import utils.byte_order.EByteOrder
 import java.nio.ByteBuffer
 
 data class DELF64ProgramHeader(
@@ -19,9 +20,9 @@ data class DELF64ProgramHeader(
         fun forText(size: Long) = DELF64ProgramHeader(
             type = 1, // LOAD
             access_flags = 5, // READ + EXEC,
-            offset = 0x1000L,
+            offset = HEADER_SIZE.toLong() + PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs,
             virtual_address = ARCH.ELF_ENTRY!! + 0x1000L,
-            physical_address = 0,
+            physical_address = ARCH.ELF_ENTRY!! + 0x1000L,
             in_file_size = size,
             in_memory_size = size,
             align = 0x1000L
@@ -31,14 +32,14 @@ data class DELF64ProgramHeader(
     fun toByteArray(): ByteArray {
         val buffer = ByteBuffer.allocate(PROGRAM_HEADER_SIZE.toInt()).order(ARCH.BYTE_ORDER.toJavaByteOrder())
 
-        buffer.putInt(type)
-        buffer.putInt(access_flags)
-        buffer.putLong(offset)
-        buffer.putLong(virtual_address)
-        buffer.putLong(physical_address)
-        buffer.putLong(in_file_size)
-        buffer.putLong(in_memory_size)
-        buffer.putLong(align)
+        buffer.put(type.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(access_flags.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(offset.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(virtual_address.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(physical_address.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(in_file_size.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(in_memory_size.toByteBuffer(ARCH.BYTE_ORDER).array())
+        buffer.put(align.toByteBuffer(ARCH.BYTE_ORDER).array())
 
         return buffer.array()
     }

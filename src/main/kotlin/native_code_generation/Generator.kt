@@ -10,7 +10,6 @@ class Generator(
     private val input: List<AASTNode>
 ) {
     private var output: MutableList<UInt> = mutableListOf()
-//    private var current_address: ULong = architecture.ELF_REQUIREMENTS!!.ENTRY
     private var blocks: MutableMap<String, ULong> = mutableMapOf()
 
     fun compile(): List<UInt> {
@@ -52,6 +51,5 @@ class Generator(
     }
 
     private fun saveBlock(target: DBlockNode){
-//        blocks += Pair(target.name, current_address)
     }
 }

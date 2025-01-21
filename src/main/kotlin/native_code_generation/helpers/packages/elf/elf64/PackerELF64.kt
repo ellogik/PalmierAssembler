@@ -28,6 +28,7 @@ object PackerELF64 : APacker() {
         val text_section_header_bin = DELF64SectionHeader.forText(size).toByteArray()
         val shstrtab_data = byteArrayOf(
             0,            // \0
+            '.'.code.toByte(),
             's'.code.toByte(),
             'h'.code.toByte(),
             's'.code.toByte(),
@@ -37,6 +38,7 @@ object PackerELF64 : APacker() {
             'a'.code.toByte(),
             'b'.code.toByte(),
             0,
+            '.'.code.toByte(),
             't'.code.toByte(),
             'e'.code.toByte(),
             'x'.code.toByte(),

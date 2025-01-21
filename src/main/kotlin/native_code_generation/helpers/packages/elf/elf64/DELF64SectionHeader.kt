@@ -28,16 +28,16 @@ data class DELF64SectionHeader(
             DOT_TEXT_SIZE = size
 
             return DELF64SectionHeader(
-                name = 10, //.text
+                name = 11, //.text
                 type = 1, // progbits
                 flags = 0x6, // SHF_ALLOC | SHF_EXECINSTR
                 address = ARCH.ELF_ENTRY!! + 0x1000L,
                 offset = (
-                        HEADER_SIZE +
+                            HEADER_SIZE +
                                 (PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs) +
                                 (SECTION_HEADER_SIZE * PackerELF64.num_of_shs)
-                        ).toLong(),
-                size = size * UInt.SIZE_BYTES,
+                         ).toLong(),
+                size = size,
                 link = 0,
                 info = 0,
                 address_align = 0x1000,
@@ -55,7 +55,7 @@ data class DELF64SectionHeader(
                 offset = HEADER_SIZE +
                             (PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs) +
                             (SECTION_HEADER_SIZE * PackerELF64.num_of_shs) + DOT_TEXT_SIZE!!.toLong(),
-                size = size * Byte.SIZE_BYTES,
+                size = size,
                 link = 0,
                 info = 0,
                 address_align = 2,
