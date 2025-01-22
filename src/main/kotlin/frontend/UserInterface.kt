@@ -11,7 +11,7 @@ import java.nio.file.Paths
 object UserInterface {
     private val CURRENT_DIRECTORY: Path = Paths.get("").toAbsolutePath()
     private var SOURCE: String = ""
-    private const val APP_VERSION = "0.0.3KK gallium"
+    private const val APP_VERSION = "gallium(0.0.3)"
 
     fun start(args: Array<String>) {
         val file_path = CURRENT_DIRECTORY.resolve(args[0])

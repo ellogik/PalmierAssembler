@@ -4,6 +4,7 @@ import native_code_generation.helpers.packages.elf.elf64.PackerELF64.ARCH
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.HEADER_SIZE
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.PROGRAM_HEADER_SIZE
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.SECTION_HEADER_SIZE
+import native_code_generation.helpers.packages.elf.elf64.PackerELF64.SH_STR_TAB_INDEX
 import utils.byte_order.EByteOrder
 import java.nio.ByteBuffer
 import kotlin.concurrent.timer
@@ -23,6 +24,7 @@ data class DELF64SectionHeader(
     companion object {
         private var DOT_TEXT_SIZE: Long? = null
         private var DOT_SH_STR_TAB_SIZE: Long? = null
+        private var DOT_SYM_TAB_SIZE: Long? = null
 
         fun forText(size: Long): DELF64SectionHeader {
             DOT_TEXT_SIZE = size
@@ -44,6 +46,20 @@ data class DELF64SectionHeader(
                 entry_size = 0
             )
         }
+
+        fun forNull() = DELF64SectionHeader(
+            name = 0,
+            type = 0,
+            flags = 0,
+            address = 0,
+            offset = 0,
+            size = 0,
+            link = 0,
+            info = 0,
+            address_align = 0,
+            entry_size = 0
+        )
+
         fun forShStrTab(size: Long): DELF64SectionHeader {
             DOT_SH_STR_TAB_SIZE = size
 
@@ -54,12 +70,31 @@ data class DELF64SectionHeader(
                 address = 0,
                 offset = HEADER_SIZE +
                             (PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs) +
-                            (SECTION_HEADER_SIZE * PackerELF64.num_of_shs) + DOT_TEXT_SIZE!!.toLong(),
+                            (SECTION_HEADER_SIZE * PackerELF64.num_of_shs) + DOT_TEXT_SIZE!!,
                 size = size,
                 link = 0,
                 info = 0,
                 address_align = 2,
                 entry_size = 0
+            )
+        }
+
+        fun forSymTab(size: Long): DELF64SectionHeader {
+            DOT_SYM_TAB_SIZE = size
+
+            return DELF64SectionHeader(
+                name = 17, // .symtab
+                type = 2, // symtab
+                flags = 0,
+                address = 0,
+                offset = HEADER_SIZE +
+                        (PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs) +
+                        (SECTION_HEADER_SIZE * PackerELF64.num_of_shs) + DOT_TEXT_SIZE!! + DOT_SH_STR_TAB_SIZE!!,
+                size = size,
+                link = SH_STR_TAB_INDEX.toInt(),
+                info = (size / 24).toInt(),
+                address_align = 8,
+                entry_size = 24
             )
         }
     }

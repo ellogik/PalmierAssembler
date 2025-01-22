@@ -6,6 +6,7 @@ import native_code_generation.helpers.packages.elf.elf64.PackerELF64.HEADER_SIZE
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.OS
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.PROGRAM_HEADER_SIZE
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.SECTION_HEADER_SIZE
+import native_code_generation.helpers.packages.elf.elf64.PackerELF64.SH_STR_TAB_INDEX
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.num_of_phs
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.num_of_shs
 import utils.errors.DInvalidArgumentError
@@ -39,13 +40,13 @@ data class DELF64Header(
         fun fromStuff() = DELF64Header(
             class_type = 2, // ELF64
             endianness = ARCH.BYTE_ORDER.toELF(),
-            elf_version = 1, // current
+            elf_version = 2, // current
             os_abi = OS.toELFAbi(),
             abi_version = 0, // none
             type = 2, // exec
             machine = ARCH.toELF(),
             version = 1, // current
-            entry = if(ARCH.ELF_ENTRY != null) ARCH.ELF_ENTRY!! else throw DInvalidArgumentError("$ARCH doesn't implement ELF"),
+            entry = if(ARCH.ELF_ENTRY != null) ARCH.ELF_ENTRY!! + 0x1000 else throw DInvalidArgumentError("$ARCH doesn't implement ELF"),
             ph_offset = HEADER_SIZE.toLong(),
             sh_offset = (HEADER_SIZE + num_of_phs * PROGRAM_HEADER_SIZE).toLong(),
             flags = 0,
@@ -54,7 +55,7 @@ data class DELF64Header(
             ph_count = num_of_phs,
             sh_entry_size = SECTION_HEADER_SIZE,
             sh_count = num_of_shs,
-            sh_str_index = (num_of_shs - 1).toShort() // last
+            sh_str_index = SH_STR_TAB_INDEX
         )
     }
 
