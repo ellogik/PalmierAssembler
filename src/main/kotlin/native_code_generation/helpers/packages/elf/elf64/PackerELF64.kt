@@ -61,12 +61,19 @@ object PackerELF64 : APacker() {
         ).toByteArray()
 
         val symtab_section_data = DELF64Symbol(
+            name = 0,
+            info = 0,
+            other = 0,
+            section_index = 0,
+            value = 0,
+            size = 0
+        ).toByteArray() + DELF64Symbol(
             name = 11,
             info = 0x3,
             other = 0,
             section_index = TEXT_INDEX,
             value = 0x0,
-            size = size
+            size = 0
         ).toByteArray()
 
         val symtab_section_header_bin = DELF64SectionHeader.forSymTab(symtab_section_data.size.toLong()).toByteArray()

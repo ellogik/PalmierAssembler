@@ -3,6 +3,7 @@ package native_code_generation.helpers.packages.elf.elf64
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.ARCH
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.HEADER_SIZE
 import native_code_generation.helpers.packages.elf.elf64.PackerELF64.PROGRAM_HEADER_SIZE
+import native_code_generation.helpers.packages.elf.elf64.PackerELF64.SECTION_HEADER_SIZE
 import utils.byte_order.EByteOrder
 import java.nio.ByteBuffer
 
@@ -20,7 +21,9 @@ data class DELF64ProgramHeader(
         fun forText(size: Long) = DELF64ProgramHeader(
             type = 1, // LOAD
             access_flags = 5, // READ + EXEC,
-            offset = HEADER_SIZE.toLong() + PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs,
+            offset = HEADER_SIZE.toLong() +
+                    PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs +
+                    SECTION_HEADER_SIZE * PackerELF64.num_of_shs,
             virtual_address = ARCH.ELF_ENTRY!! + 0x1000L,
             physical_address = ARCH.ELF_ENTRY!! + 0x1000L,
             in_file_size = size,
