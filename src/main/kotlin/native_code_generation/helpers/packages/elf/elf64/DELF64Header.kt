@@ -43,10 +43,10 @@ data class DELF64Header(
             elf_version = 1, // current
             os_abi = OS.toELFAbi(),
             abi_version = 0, // none
-            type = 1, // exec
+            type = 1, // relocatable(static lib)
             machine = ARCH.toELF(),
             version = 1, // current
-            entry = if(ARCH.ELF_ENTRY != null) ARCH.ELF_ENTRY!! + 0x1000 else throw DInvalidArgumentError("$ARCH doesn't implement ELF"),
+            entry = if(ARCH.ELF_ENTRY != null) ARCH.ELF_ENTRY!! else throw DInvalidArgumentError("$ARCH doesn't implement ELF"),
             ph_offset = HEADER_SIZE.toLong(),
             sh_offset = (HEADER_SIZE + num_of_phs * PROGRAM_HEADER_SIZE).toLong(),
             flags = 0,

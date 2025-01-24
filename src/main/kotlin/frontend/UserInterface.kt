@@ -31,6 +31,6 @@ object UserInterface {
             Center.fullCompile()
         )
 
-        println("\u001b[1m[PROCESS]\u001B[0m Done! Your executable is \u001b[4m\u001b[32m'${file_path.fileName.toString() + ".compiled"}'\u001b[0m")
+        println("\u001b[1m[PROCESS]\u001B[0m Done! Your static library is \u001b[4m\u001b[32m'${file_path.fileName.toString() + ".compiled"}'\u001b[0m")
     }
 }

@@ -30,30 +30,12 @@ class Lexer(private val _input: String) {
                         continue@LINE_MARK
                     }
 
-                    else -> {
-                        when {
-                            char.value.isLetter() -> {
-                                tokenizeIdentifier(line.value).let {
-                                    tokenizeKeyword(it.value!!).let { it2 ->
-                                        tokens_per_line += if(it2.type != ETokenType.INVALID_TOKEN)
-                                            it2
-                                        else
-                                            it
-                                    }
-                                }
-                            }
-
-                            char.value.isWhitespace() -> {}
-
-                            char.value.isDigit() -> {
-                                tokens_per_line += tokenizeNumber(line.value)
-                            }
-
-                            else -> {
-                                throw DLexerError("Unknown Symbol '${char.value}' at line ${line.index + 1} at ${char.index + 1}", ELexerErrorType.UNKNOWN_SYMBOL, char.toString())
-                            }
-                        }
+                    '"' -> {
+                        _current_index_in_line++
+                        tokens_per_line += tokenizeString(line.value)
                     }
+
+                    else -> tokenizeDifficult(char, tokens_per_line, line)
                 }
 
                 _current_index_in_line++
@@ -65,6 +47,50 @@ class Lexer(private val _input: String) {
         }
 
         return _tokens
+    }
+
+    private fun tokenizeDifficult(
+        char: IndexedValue<Char>,
+        tokens_per_line: MutableList<DToken>,
+        line: IndexedValue<String>
+    ) = when {
+        char.value.isLetter() -> {
+            tokenizeIdentifier(line.value).let {
+                tokenizeKeyword(it.value!!).let { it2 ->
+                    tokens_per_line += if(it2.type != ETokenType.INVALID_TOKEN)
+                        it2
+                    else
+                        it
+                }
+            }
+        }
+
+        char.value.isWhitespace() -> {}
+
+        char.value.isDigit() -> {
+            tokens_per_line += tokenizeNumber(line.value)
+        }
+
+        else -> {
+            throw DLexerError("Unknown Symbol '${char.value}' at line ${line.index + 1} at ${char.index + 1}", ELexerErrorType.UNKNOWN_SYMBOL, char.toString())
+        }
+    }
+
+    private fun tokenizeString(current_line: String): DToken {
+        var buffer = ""
+
+        for (char in current_line.withIndex()){
+            if (char.index < _current_index_in_line) continue
+
+            if (char.value == '"') break
+
+            buffer += char.value
+            _current_index_in_line++
+        }
+
+        _current_index_in_line++
+
+        return DToken(ETokenType.STRING, buffer)
     }
 
     private fun tokenizeIdentifier(current_line: String): DToken {

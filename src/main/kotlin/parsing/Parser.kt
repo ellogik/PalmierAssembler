@@ -7,6 +7,7 @@ import parsing.nodes.base.DBlockNode
 import parsing.nodes.commands.DMoveCommandNode
 import parsing.nodes.commands.DSystemCallCommandNode
 import parsing.nodes.expressions.DIntegerNode
+import parsing.nodes.expressions.DStringNode
 import parsing.nodes.regs_and_vars.DGeneralRegNode
 
 class Parser(private val input: List<List<DToken>>) {
@@ -100,6 +101,7 @@ class Parser(private val input: List<List<DToken>>) {
     private fun parseExpression(from: MutableList<DToken>): AASTNode {
         return when {
             from.size == 1 && from[0].type == ETokenType.NUMBER -> DIntegerNode(from[0].value!!.toInt())
+            from.size == 1 && from[0].type == ETokenType.STRING -> DStringNode(from[0].value!!)
 
             else -> throw DParserError("Invalid expression at $from")
         }

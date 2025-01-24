@@ -2,6 +2,7 @@ package lexicalization
 
 enum class ETokenType {
     IDENTIFIER,
+    STRING,
     NUMBER,
 
     CMD_AND_ARGS_DIVIDER,               // Symbol: ':'
