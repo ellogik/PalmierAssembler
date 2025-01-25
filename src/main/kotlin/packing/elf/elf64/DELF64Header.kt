@@ -1,16 +1,14 @@
-package native_code_generation.helpers.packages.elf.elf64
+package packing.elf.elf64
 
-import native_code_generation.helpers.AArchitecture
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64.ARCH
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64.HEADER_SIZE
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64.OS
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64.PROGRAM_HEADER_SIZE
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64.SECTION_HEADER_SIZE
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64.SH_STR_TAB_INDEX
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64.num_of_phs
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64.num_of_shs
+import packing.elf.elf64.PackerELF64.ARCH
+import packing.elf.elf64.PackerELF64.HEADER_SIZE
+import packing.elf.elf64.PackerELF64.OS
+import packing.elf.elf64.PackerELF64.PROGRAM_HEADER_SIZE
+import packing.elf.elf64.PackerELF64.SECTION_HEADER_SIZE
+import packing.elf.elf64.PackerELF64.SH_STR_TAB_INDEX
+import packing.elf.elf64.PackerELF64.num_of_phs
+import packing.elf.elf64.PackerELF64.num_of_shs
 import utils.errors.DInvalidArgumentError
-import utils.typing.EOperatingSystem
 import java.nio.ByteBuffer
 
 data class DELF64Header(

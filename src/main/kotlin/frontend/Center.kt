@@ -4,7 +4,7 @@ import lexicalization.DToken
 import lexicalization.Lexer
 import native_code_generation.Generator
 import native_code_generation.helpers.AArchitecture
-import native_code_generation.helpers.APacker
+import packing.APacker
 import parsing.Parser
 import parsing.nodes.AASTNode
 

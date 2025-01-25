@@ -5,6 +5,11 @@ enum class ETokenType {
     STRING,
     NUMBER,
 
+    MINUS,                              // Symbol: '-'
+    PLUS,                               // Symbol: '+'
+    MULTIPLY,                           // Symbol: '*'
+    DIVIDE,                             // Symbol: '\'
+
     CMD_AND_ARGS_DIVIDER,               // Symbol: ':'
     ARGS_DIVIDER,                       // Symbol: ','
 
@@ -15,10 +20,13 @@ enum class ETokenType {
     REG_PREFIX,                         // Symbol: '$'
 
     KW_BLOCK,                           // Keyword: 'block'
+    KW_MACRO,                           // Keyword: 'macro'
+    KW_GROUP,                           // Keyword: 'group'
+    KW_PERMANENT,                       // Keyword: 'permanent'
+    KW_TERM,                            // Keyword: 'term'
 
     CMD_MOVE,                           // Command: 'move'
     CMD_SYSTEM_CALL,                    // Command: 'systemCall'
-
 
     INVALID_TOKEN
 }

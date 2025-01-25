@@ -2,6 +2,16 @@ package lexicalization
 
 class Lexer(private val _input: String) {
     private val _tokens: MutableList<MutableList<DToken>> = mutableListOf()
+    private val _KEYWORDS = mapOf(
+        "block" to DToken(ETokenType.KW_BLOCK),
+        "macro" to DToken(ETokenType.KW_MACRO),
+        "group" to DToken(ETokenType.KW_GROUP),
+        "permanent" to DToken(ETokenType.KW_PERMANENT),
+        "term" to DToken(ETokenType.KW_TERM),
+
+        "move" to DToken(ETokenType.CMD_MOVE),
+        "systemCall" to DToken(ETokenType.CMD_SYSTEM_CALL),
+    )
     private var _current_index_in_line = 0
 
     fun tokenize(): MutableList<MutableList<DToken>> {
@@ -22,6 +32,12 @@ class Lexer(private val _input: String) {
 
                     '%' -> tokens_per_line += DToken(ETokenType.VAR_PREFIX)
                     '$' -> tokens_per_line += DToken(ETokenType.REG_PREFIX)
+
+                    '-' -> tokens_per_line += DToken(ETokenType.MINUS)
+                    '+' -> tokens_per_line += DToken(ETokenType.PLUS)
+                    '\\' -> tokens_per_line += DToken(ETokenType.DIVIDE)
+                    '*' -> tokens_per_line += DToken(ETokenType.MULTIPLY)
+
 
                     '/' -> {
                         _current_index_in_line = 0
@@ -132,17 +148,12 @@ class Lexer(private val _input: String) {
         return DToken(ETokenType.NUMBER, buffer)
     }
 
-    private fun tokenizeKeyword(input: String): DToken {
-        return when( input ){
-            "block" -> DToken(ETokenType.KW_BLOCK)
+    private fun tokenizeKeyword(input: String) = when( _KEYWORDS[input] ){
+            null -> DToken(ETokenType.INVALID_TOKEN)
 
-            "move" -> DToken(ETokenType.CMD_MOVE)
-            "systemCall" -> DToken(ETokenType.CMD_SYSTEM_CALL)
-
-
-            else -> DToken(ETokenType.INVALID_TOKEN)
+            else -> _KEYWORDS[input]!!
         }
-    }
+
 
     private fun divideByLinesAndRemoveWhitespaces(input: String): MutableList<String>{
         val buffer = mutableListOf<String>()

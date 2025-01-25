@@ -1,5 +1,6 @@
-package native_code_generation.helpers
+package packing
 
+import native_code_generation.helpers.AArchitecture
 import utils.typing.EOperatingSystem
 
 abstract class APacker {

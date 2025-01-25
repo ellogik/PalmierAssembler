@@ -1,4 +1,4 @@
-package native_code_generation.helpers.packages.elf.elf64
+package packing.elf.elf64
 
 import native_code_generation.helpers.AArchitecture
 import native_code_generation.helpers.architectures.ArchX86_64

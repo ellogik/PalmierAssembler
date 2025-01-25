@@ -6,9 +6,13 @@ import parsing.nodes.AASTNode
 import parsing.nodes.base.DBlockNode
 import parsing.nodes.commands.DMoveCommandNode
 import parsing.nodes.commands.DSystemCallCommandNode
+import parsing.nodes.expressions.DIdNode
 import parsing.nodes.expressions.DIntegerNode
 import parsing.nodes.expressions.DStringNode
 import parsing.nodes.regs_and_vars.DGeneralRegNode
+import parsing.nodes.regs_and_vars.DSystemCallArgVarNode
+import parsing.nodes.regs_and_vars.DSystemCallIdVarNode
+import kotlin.math.E
 
 class Parser(private val input: List<List<DToken>>) {
     private val parsed: MutableList<AASTNode> = mutableListOf()
@@ -23,6 +27,8 @@ class Parser(private val input: List<List<DToken>>) {
                 line.value[2].type == ETokenType.START_CODE_SPACE){
                 parsed += parseBlock(current_line_index)
             }
+            else if (line.value[0].type == ETokenType.KW_PERMANENT)
+                current_line_index++
             else
                 throw DParserError("Unknown top-layer construction on line ${line.index + 1}")
         }
@@ -63,7 +69,7 @@ class Parser(private val input: List<List<DToken>>) {
             ETokenType.CMD_SYSTEM_CALL -> DSystemCallCommandNode()
             ETokenType.CMD_MOVE -> parseMoveCommand()
 
-            else -> throw DParserError("")
+            else -> throw DParserError("Unknown command at $current_line_index")
         }
     }
 
@@ -98,21 +104,36 @@ class Parser(private val input: List<List<DToken>>) {
         )
     }
 
-    private fun parseExpression(from: MutableList<DToken>): AASTNode {
-        return when {
-            from.size == 1 && from[0].type == ETokenType.NUMBER -> DIntegerNode(from[0].value!!.toInt())
-            from.size == 1 && from[0].type == ETokenType.STRING -> DStringNode(from[0].value!!)
+    private fun parseExpression(from: MutableList<DToken>) = when {
+        from.size == 1 -> when (from[0].type) {
+            ETokenType.NUMBER -> DIntegerNode(from[0].value!!.toInt())
+            ETokenType.STRING -> DStringNode(from[0].value!!)
+            ETokenType.IDENTIFIER -> DIdNode(from[0].value!!)
 
             else -> throw DParserError("Invalid expression at $from")
         }
+
+        else -> throw DParserError("Invalid expression at $from")
     }
 
-    private fun parseRegOrVar(from: MutableList<DToken>): AASTNode {
-        return when {
-            from[0].type == ETokenType.REG_PREFIX && from[1].value!!.startsWith("general_reg") -> {
-                DGeneralRegNode(from[1].value!!)
+
+    private fun parseRegOrVar(from: MutableList<DToken>): AASTNode = when (from[0].type) {
+        ETokenType.REG_PREFIX ->
+            when {
+                from[1].value!!.startsWith("general_reg") -> DGeneralRegNode(from[1].value!!)
+
+                else -> throw DParserError("Undefined reg or var: $from")
             }
-            else -> throw DParserError("")
-        }
+        ETokenType.VAR_PREFIX ->
+            when {
+                from[1].value!! == "system_call_id" -> DSystemCallIdVarNode()
+                from[1].value!!.startsWith("system_call_arg") -> DSystemCallArgVarNode(from[1].value!!)
+
+                else -> throw DParserError("Undefined reg or var: $from")
+            }
+
+        else -> throw DParserError("Undefined reg or var: $from")
     }
+
+
 }

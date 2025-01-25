@@ -20,12 +20,12 @@ object ArchX86_64 : AArchitecture() {
         Pair(DSystemCallCommandNode::class.java, listOf(0x0Fu, 0x05u))
     )
     private val MOV_REG_IMM32_OP_CODES : Map<AASTNode, List<UInt>> = mapOf(
-        DGeneralRegNode(1) to listOf(0xB8u),    // rax <- imm32\64
-        DGeneralRegNode(2) to listOf(0xB8u),    // rcx <- imm32\64
-        DGeneralRegNode(3) to listOf(0xBAu),    // rdx <- imm32\64
-        DGeneralRegNode(4) to listOf(0xBBu),    // rbx <- imm32\64
-        DGeneralRegNode(5) to listOf(0xBEu),    // rsi <- imm32\64
-        DGeneralRegNode(6) to listOf(0xBFu),    // rdi <- imm32\64
+        DGeneralRegNode(1u) to listOf(0xB8u),    // rax <- imm32\64
+        DGeneralRegNode(2u) to listOf(0xB8u),    // rcx <- imm32\64
+        DGeneralRegNode(3u) to listOf(0xBAu),    // rdx <- imm32\64
+        DGeneralRegNode(4u) to listOf(0xBBu),    // rbx <- imm32\64
+        DGeneralRegNode(5u) to listOf(0xBEu),    // rsi <- imm32\64
+        DGeneralRegNode(6u) to listOf(0xBFu),    // rdi <- imm32\64
     )
 
 

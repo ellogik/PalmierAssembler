@@ -1,7 +1,7 @@
-package native_code_generation.helpers.packages.elf.elf64
+package packing.elf.elf64
 
 import native_code_generation.helpers.AArchitecture
-import native_code_generation.helpers.APacker
+import packing.APacker
 import utils.typing.EOperatingSystem
 
 object PackerELF64 : APacker() {

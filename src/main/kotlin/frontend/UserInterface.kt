@@ -2,7 +2,8 @@ package frontend
 
 import com.github.lalyos.jfiglet.FigletFont
 import native_code_generation.helpers.architectures.ArchX86_64
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64
+import packing.elf.elf64.PackerELF64
+import utils.errors.DInvalidArgumentError
 import utils.typing.EOperatingSystem
 import java.nio.file.Files
 import java.nio.file.Path
@@ -11,14 +12,14 @@ import java.nio.file.Paths
 object UserInterface {
     private val CURRENT_DIRECTORY: Path = Paths.get("").toAbsolutePath()
     private var SOURCE: String = ""
-    private const val APP_VERSION = "gallium(0.0.3)"
+    private const val APP_VERSION = "bohrium(0.0.4)"
 
     fun start(args: Array<String>) {
         val file_path = CURRENT_DIRECTORY.resolve(args[0])
         Files.readAllLines(file_path).forEach { SOURCE += it + "\n" }
 
         Center.TEXT = SOURCE
-        Center.CURRENT_PACKER = PackerELF64
+        Center.CURRENT_PACKER = fromStringToPacker(args[1])
         Center.CURRENT_OS = EOperatingSystem.LINUX
         Center.CURRENT_ARCHITECTURE = ArchX86_64
 
@@ -32,5 +33,11 @@ object UserInterface {
         )
 
         println("\u001b[1m[PROCESS]\u001B[0m Done! Your static library is \u001b[4m\u001b[32m'${file_path.fileName.toString() + ".compiled"}'\u001b[0m")
+    }
+
+    private fun fromStringToPacker(string: String) = when(string) {
+        "elf64" -> PackerELF64
+
+        else -> throw DInvalidArgumentError("Unknown Packer:  $string")
     }
 }

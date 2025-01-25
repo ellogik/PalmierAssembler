@@ -1,6 +1,6 @@
-package native_code_generation.helpers.packages.elf.elf64
+package packing.elf.elf64
 
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64.ARCH
+import packing.elf.elf64.PackerELF64.ARCH
 import java.nio.ByteBuffer
 
 data class DELF64Symbol(

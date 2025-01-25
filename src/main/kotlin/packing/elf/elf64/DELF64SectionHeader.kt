@@ -1,13 +1,11 @@
-package native_code_generation.helpers.packages.elf.elf64
+package packing.elf.elf64
 
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64.ARCH
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64.HEADER_SIZE
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64.PROGRAM_HEADER_SIZE
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64.SECTION_HEADER_SIZE
-import native_code_generation.helpers.packages.elf.elf64.PackerELF64.SH_STR_TAB_INDEX
-import utils.byte_order.EByteOrder
+import packing.elf.elf64.PackerELF64.ARCH
+import packing.elf.elf64.PackerELF64.HEADER_SIZE
+import packing.elf.elf64.PackerELF64.PROGRAM_HEADER_SIZE
+import packing.elf.elf64.PackerELF64.SECTION_HEADER_SIZE
+import packing.elf.elf64.PackerELF64.SH_STR_TAB_INDEX
 import java.nio.ByteBuffer
-import kotlin.concurrent.timer
 
 data class DELF64SectionHeader(
     val name: Int,
