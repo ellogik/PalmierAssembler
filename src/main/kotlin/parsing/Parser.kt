@@ -10,9 +10,9 @@ import parsing.nodes.expressions.DIdNode
 import parsing.nodes.expressions.DIntegerNode
 import parsing.nodes.expressions.DStringNode
 import parsing.nodes.regs_and_vars.DGeneralRegNode
-import parsing.nodes.regs_and_vars.DSystemCallArgVarNode
-import parsing.nodes.regs_and_vars.DSystemCallIdVarNode
-import kotlin.math.E
+import parsing.nodes.regs_and_vars.system_calls.DSystemCallArgVarNode
+import parsing.nodes.regs_and_vars.system_calls.DSystemCallIdVarNode
+import utils.errors.DParserError
 
 class Parser(private val input: List<List<DToken>>) {
     private val parsed: MutableList<AASTNode> = mutableListOf()

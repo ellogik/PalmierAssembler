@@ -1,4 +1,4 @@
-package lexicalization
+package utils.errors
 
 data class DLexerError(
     val what: String,

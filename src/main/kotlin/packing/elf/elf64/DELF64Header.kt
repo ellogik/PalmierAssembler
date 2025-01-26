@@ -1,5 +1,7 @@
 package packing.elf.elf64
 
+import native_code_generation.helpers.architectures.IELFSupportInArch
+import native_code_generation.helpers.operating_systems.IELFSupportInOs
 import packing.elf.elf64.PackerELF64.ARCH
 import packing.elf.elf64.PackerELF64.HEADER_SIZE
 import packing.elf.elf64.PackerELF64.OS
@@ -39,12 +41,12 @@ data class DELF64Header(
             class_type = 2, // ELF64
             endianness = ARCH.BYTE_ORDER.toELF(),
             elf_version = 1, // current
-            os_abi = OS.toELFAbi(),
+            os_abi = (OS as IELFSupportInOs).toELFAbi(),
             abi_version = 0, // none
             type = 1, // relocatable(static lib)
-            machine = ARCH.toELF(),
+            machine = (ARCH as IELFSupportInArch).ELF_ID,
             version = 1, // current
-            entry = if(ARCH.ELF_ENTRY != null) ARCH.ELF_ENTRY!! else throw DInvalidArgumentError("$ARCH doesn't implement ELF"),
+            entry = (ARCH as IELFSupportInArch).ELF_ENTRY,
             ph_offset = HEADER_SIZE.toLong(),
             sh_offset = (HEADER_SIZE + num_of_phs * PROGRAM_HEADER_SIZE).toLong(),
             flags = 0,

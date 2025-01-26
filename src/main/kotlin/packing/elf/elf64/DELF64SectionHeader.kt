@@ -1,5 +1,6 @@
 package packing.elf.elf64
 
+import native_code_generation.helpers.architectures.IELFSupportInArch
 import packing.elf.elf64.PackerELF64.ARCH
 import packing.elf.elf64.PackerELF64.HEADER_SIZE
 import packing.elf.elf64.PackerELF64.PROGRAM_HEADER_SIZE
@@ -31,7 +32,7 @@ data class DELF64SectionHeader(
                 name = 11, //.text
                 type = 1, // progbits
                 flags = 0x6, // SHF_ALLOC | SHF_EXECINSTR
-                address = ARCH.ELF_ENTRY!! + 0x1000L,
+                address = (ARCH as IELFSupportInArch).ELF_ENTRY,
                 offset = (
                             HEADER_SIZE +
                                 (PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs) +

@@ -4,15 +4,14 @@ import lexicalization.DToken
 import lexicalization.Lexer
 import native_code_generation.Generator
 import native_code_generation.helpers.AArchitecture
+import native_code_generation.helpers.AOperatingSystem
 import packing.APacker
 import parsing.Parser
 import parsing.nodes.AASTNode
 
-import utils.typing.EOperatingSystem
-
 object Center {
     lateinit var CURRENT_ARCHITECTURE: AArchitecture
-    lateinit var CURRENT_OS: EOperatingSystem
+    lateinit var CURRENT_OS: AOperatingSystem
     lateinit var CURRENT_PACKER: APacker
     lateinit var TEXT: String
     private lateinit var TOKENS: List<List<DToken>>

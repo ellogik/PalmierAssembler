@@ -1,5 +1,6 @@
 package packing.elf.elf64
 
+import native_code_generation.helpers.architectures.IELFSupportInArch
 import packing.elf.elf64.PackerELF64.ARCH
 import packing.elf.elf64.PackerELF64.HEADER_SIZE
 import packing.elf.elf64.PackerELF64.PROGRAM_HEADER_SIZE
@@ -23,8 +24,8 @@ data class DELF64ProgramHeader(
             offset = HEADER_SIZE.toLong() +
                     PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs +
                     SECTION_HEADER_SIZE * PackerELF64.num_of_shs,
-            virtual_address = ARCH.ELF_ENTRY!! + 0x1000L,
-            physical_address = ARCH.ELF_ENTRY!! + 0x1000L,
+            virtual_address = (ARCH as IELFSupportInArch).ELF_ENTRY,
+            physical_address = (ARCH as IELFSupportInArch).ELF_ENTRY,
             in_file_size = size,
             in_memory_size = size,
             align = 0x1000L

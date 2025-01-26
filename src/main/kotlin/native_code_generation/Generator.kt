@@ -4,6 +4,7 @@ import parsing.nodes.AASTNode
 import parsing.nodes.base.DBlockNode
 import parsing.nodes.commands.DMoveCommandNode
 import native_code_generation.helpers.AArchitecture
+import utils.errors.DCompileError
 
 class Generator(
     private val architecture: AArchitecture,

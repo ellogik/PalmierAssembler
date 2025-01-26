@@ -1,4 +1,4 @@
-package native_code_generation
+package utils.errors
 
 data class DCompileError(
     val what: String

@@ -1,4 +1,4 @@
-package utils.typing
+package utils
 
 enum class EBitType {
     X8,

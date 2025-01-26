@@ -1,5 +1,8 @@
 package lexicalization
 
+import utils.errors.DLexerError
+import utils.errors.ELexerErrorType
+
 class Lexer(private val _input: String) {
     private val _tokens: MutableList<MutableList<DToken>> = mutableListOf()
     private val _KEYWORDS = mapOf(

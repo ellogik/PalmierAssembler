@@ -1,8 +1,8 @@
 package packing.elf.elf64
 
 import native_code_generation.helpers.AArchitecture
+import native_code_generation.helpers.AOperatingSystem
 import packing.APacker
-import utils.typing.EOperatingSystem
 
 object PackerELF64 : APacker() {
     var num_of_phs: Short = 1
@@ -13,10 +13,10 @@ object PackerELF64 : APacker() {
     const val SH_STR_TAB_INDEX: Short = 2
     const val TEXT_INDEX: Short = 1
     lateinit var ARCH: AArchitecture
-    lateinit var OS: EOperatingSystem
+    lateinit var OS: AOperatingSystem
 
 
-    override fun setSettings(arch: AArchitecture, os: EOperatingSystem) {
+    override fun setSettings(arch: AArchitecture, os: AOperatingSystem) {
         ARCH = arch
         OS = os
     }
