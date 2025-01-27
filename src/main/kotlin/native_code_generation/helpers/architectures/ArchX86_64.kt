@@ -58,7 +58,7 @@ object ArchX86_64 : AArchitecture(), IELFSupportInArch {
                     }
 
                     is DIdNode -> {
-                        native_commands += MOV_REG_IMM32_OP_CODES[CURRENT_OS.OS_VARS[this]!![from.receiver]]!!
+                        //native_commands += MOV_REG_IMM32_OP_CODES[CURRENT_OS.OS_VARS[this]!![from.receiver]]!!
                         // TODO: Create translate from ID to memory address
                     }
                 }

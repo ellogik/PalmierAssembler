@@ -27,3 +27,5 @@ fun Int.toByteBuffer(endian: EByteOrder): ByteBuffer {
 
     return buffer
 }
+
+fun List<Any>.isSingle() = this.size == 1
