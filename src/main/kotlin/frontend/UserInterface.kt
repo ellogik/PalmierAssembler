@@ -23,6 +23,8 @@ object UserInterface {
         Center.CURRENT_PACKER = fromStringToPacker(args[1])
         Center.CURRENT_OS = OsLinux
         Center.CURRENT_ARCHITECTURE = ArchX86_64
+        Center.CURRENT_PACKER.setSettings(Center.CURRENT_ARCHITECTURE, Center.CURRENT_OS)
+        Center.CURRENT_ENTRY = Center.CURRENT_PACKER.ENTRY
 
         println(FigletFont.convertOneLine("P a l m i e r A s s e m b l e r"))
         println("\u001b[1m[SELF]\u001B[0m PASM version is \u001b[4m\u001B[34m'$APP_VERSION'\n\u001b[0m")

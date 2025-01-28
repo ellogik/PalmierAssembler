@@ -8,11 +8,13 @@ import native_code_generation.helpers.AOperatingSystem
 import packing.APacker
 import parsing.Parser
 import parsing.nodes.AASTNode
+import kotlin.properties.Delegates
 
 object Center {
     lateinit var CURRENT_ARCHITECTURE: AArchitecture
     lateinit var CURRENT_OS: AOperatingSystem
     lateinit var CURRENT_PACKER: APacker
+    var CURRENT_ENTRY: Number = 0
     lateinit var TEXT: String
     private lateinit var TOKENS: List<List<DToken>>
     private lateinit var PARSED: List<AASTNode>
@@ -29,10 +31,8 @@ object Center {
     }
 
     private fun lexerize() { TOKENS = Lexer(TEXT).tokenize() }
-    private fun parse() { PARSED = Parser(TOKENS).parse() }
-    private fun compile()  { NATIVE_CODE = Generator( CURRENT_ARCHITECTURE, PARSED ).compile() }
-    private fun pack() {
-        CURRENT_PACKER.setSettings(CURRENT_ARCHITECTURE, CURRENT_OS)
-        PACKED_CODE = CURRENT_PACKER.pack(NATIVE_CODE)
-    }
+    private fun parse() { PARSED = Parser(TOKENS).parse(); println(PARSED) }
+    private fun compileData( ) {}
+    private fun compile()  { NATIVE_CODE = Generator( CURRENT_ARCHITECTURE, PARSED, CURRENT_PACKER ).compile() }
+    private fun pack() { PACKED_CODE = CURRENT_PACKER.packCode(NATIVE_CODE) }
 }

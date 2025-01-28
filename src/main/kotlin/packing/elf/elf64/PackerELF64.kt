@@ -2,26 +2,34 @@ package packing.elf.elf64
 
 import native_code_generation.helpers.AArchitecture
 import native_code_generation.helpers.AOperatingSystem
+import native_code_generation.helpers.architectures.IELFSupportInArch
 import packing.APacker
+import parsing.nodes.AASTNode
+import java.nio.ByteBuffer
 
 object PackerELF64 : APacker() {
     var num_of_phs: Short = 1
     var num_of_shs: Short = 4
+    lateinit var ARCH: AArchitecture
+    lateinit var OS: AOperatingSystem
+
     const val HEADER_SIZE: Short = 64
     const val PROGRAM_HEADER_SIZE: Short = 56
     const val SECTION_HEADER_SIZE: Short = 64
     const val SH_STR_TAB_INDEX: Short = 2
     const val TEXT_INDEX: Short = 1
-    lateinit var ARCH: AArchitecture
-    lateinit var OS: AOperatingSystem
+
+    lateinit var blocks_register_binary: ByteBuffer
+
 
 
     override fun setSettings(arch: AArchitecture, os: AOperatingSystem) {
         ARCH = arch
         OS = os
+        ENTRY = (ARCH as IELFSupportInArch).ELF_ENTRY
     }
 
-    override fun pack(executable_code: List<UInt>): ByteArray {
+    override fun packCode(executable_code: List<UInt>): ByteArray {
         val size = (executable_code.size).toLong()
         val header_bin = DELF64Header.fromStuff().toByteArray()
         val text_program_header_bin = DELF64ProgramHeader.forText(
@@ -74,7 +82,7 @@ object PackerELF64 : APacker() {
             section_index = TEXT_INDEX,
             value = 0x0,
             size = 0
-        ).toByteArray()
+        ).toByteArray() + blocks_register_binary.array()
 
         val symtab_section_header_bin = DELF64SectionHeader.forSymTab(symtab_section_data.size.toLong()).toByteArray()
         val obj = header_bin +
@@ -91,5 +99,26 @@ object PackerELF64 : APacker() {
 
 
         return obj
+    }
+
+    override fun packVariables(target: List<AASTNode>): Map<String, Long> {
+        return mapOf()
+    }
+
+    override fun registerBlocks(target: MutableMap<String, Number>) {
+        blocks_register_binary = ByteBuffer.allocate(target.size * 24)
+
+        for ( block in target ) {
+            blocks_register_binary.put(
+                DELF64Symbol(
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0
+                ).toByteArray()
+            )
+        }
     }
 }

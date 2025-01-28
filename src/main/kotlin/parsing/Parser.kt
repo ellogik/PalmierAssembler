@@ -2,6 +2,7 @@ package parsing
 
 import lexicalization.DToken
 import lexicalization.ETokenType
+import packing.elf.elf64.isSingle
 import parsing.nodes.AASTNode
 import parsing.nodes.base.DBlockNode
 import parsing.nodes.base.DPermanentDataNode
@@ -17,6 +18,7 @@ import parsing.nodes.regs_and_vars.system_calls.DSystemCallArgVarNode
 import parsing.nodes.regs_and_vars.system_calls.DSystemCallIdVarNode
 import utils.errors.DParserError
 import java.lang.reflect.Type
+import kotlin.math.truncate
 import kotlin.reflect.KClass
 
 class Parser(private val input: List<List<DToken>>) {
@@ -33,7 +35,7 @@ class Parser(private val input: List<List<DToken>>) {
                 parsed += parseBlock(current_line_index)
             }
             else if (line.value[0].type == ETokenType.KW_PERMANENT)
-                parsePermanent()
+                parsed += parsePermanent()
             else
                 throw DParserError("Unknown top-layer construction on line ${line.index + 1}")
         }
@@ -130,22 +132,30 @@ class Parser(private val input: List<List<DToken>>) {
     }
 
     private fun parseExpression(from: List<DToken>) = when {
-        from.size == 1 -> parseSimpleExpression(from[0])
+        from.isSingle() -> parseSimpleExpression(from[0])
 
         from[0].type == ETokenType.KW_TERM -> {
             lateinit var part_first: AASTNode
             lateinit var part_second: AASTNode
             lateinit var symbol: ETokenType
-            var first_or_second = false
-
+            var first_or_second = true
+            var current_index = 0
 
             for ( token in from.slice(1..<from.size).withIndex() ) {
+                if(current_index > token.index)
+                    continue
+
                 when(token.value.type) {
-                    ETokenType.VAR_PREFIX, ETokenType.REG_PREFIX ->
-                        if( first_or_second )
+                    ETokenType.VAR_PREFIX, ETokenType.REG_PREFIX -> {
+                        if( first_or_second ) {
                             part_first = parseRegOrVar(from.slice(token.index + 1..token.index + 2))
-                        else
+                        }
+                        else {
                             part_second = parseRegOrVar(from.slice(token.index + 1..token.index + 2))
+                        }
+
+                        current_index++
+                    }
 
                     ETokenType.MINUS, ETokenType.PLUS, ETokenType.MULTIPLY, ETokenType.DIVIDE -> {
                         symbol = token.value.type
@@ -153,17 +163,17 @@ class Parser(private val input: List<List<DToken>>) {
                     }
 
                     ETokenType.NUMBER, ETokenType.STRING, ETokenType.IDENTIFIER ->
-                        if( first_or_second )
+                        if (first_or_second)
                             part_first = parseSimpleExpression(token.value)
                         else
                             part_second = parseSimpleExpression(token.value)
-
 
 
                     else ->
                         throw DParserError("Invalid expression at $from")
 
                 }
+                current_index++
             }
 
             when(symbol) {
