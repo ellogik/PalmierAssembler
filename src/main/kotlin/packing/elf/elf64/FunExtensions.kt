@@ -29,3 +29,10 @@ fun Int.toByteBuffer(endian: EByteOrder): ByteBuffer {
 }
 
 fun List<Any>.isSingle() = this.size == 1
+
+fun encodeElfSymbolInfo(bind: Int, type: Int): Int {
+    require(bind in 0..0xF) { "Bind must be in range 0..15" }
+    require(type in 0..0xF) { "Type must be in range 0..15" }
+
+    return (bind shl 4) or type
+}

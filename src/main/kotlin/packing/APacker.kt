@@ -10,5 +10,5 @@ abstract class APacker {
     abstract fun setSettings(arch: AArchitecture, os: AOperatingSystem)
     abstract fun packCode(executable_code: List<UInt>): ByteArray
     abstract fun packVariables(target: List<AASTNode>): Map<String, Long>
-    abstract fun registerBlocks(target: MutableMap<String, Number>)
+    abstract fun registerBlocks(target: Map<String, Pair<Number, Number>>)
 }

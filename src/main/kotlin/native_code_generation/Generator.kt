@@ -13,7 +13,7 @@ class Generator (
     private val _input: List<AASTNode>,
     private val _packer: APacker
 ) {
-    val _blocks: MutableMap<String, Number> = mutableMapOf()
+    val blocks: MutableMap<String, Pair<Number, Number>> = mutableMapOf()
     private var _output: MutableList<UInt> = mutableListOf()
     private var _current_address: Number = _packer.ENTRY
 
@@ -22,9 +22,12 @@ class Generator (
             when(construct.value) {
                 is DBlockNode -> {
                     val block = construct.value as DBlockNode
-                    saveBlock(block)
+                    val block_address = _current_address
 
-                    _output += compileCommands(block.children)
+                    _output += compileCommands(block.children).let {
+                        saveBlock(block, it.size, block_address)
+                        it
+                    }
                 }
 
                 is DPermanentDataNode -> {}
@@ -32,8 +35,6 @@ class Generator (
                 else -> throw DCompileError("Unable to compile construction: ${construct.index + 1}, ${construct.value}")
             }
         }
-
-        println(_blocks)
 
         return _output
     }
@@ -62,7 +63,7 @@ class Generator (
         }
     }
 
-    private fun saveBlock(target: DBlockNode){
-        _blocks += target.name to _current_address
+    private fun saveBlock(target: DBlockNode, size: Number, address: Number){
+        blocks += target.name to (address to size)
     }
 }

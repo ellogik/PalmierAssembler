@@ -15,3 +15,7 @@ block start {
 
     systemCall; / exit(0) ;
 }
+
+block sc {
+    systemCall;
+}

@@ -18,8 +18,10 @@ object PackerELF64 : APacker() {
     const val SECTION_HEADER_SIZE: Short = 64
     const val SH_STR_TAB_INDEX: Short = 2
     const val TEXT_INDEX: Short = 1
+    val SH_STR_TAB_BASE_DATA_BIN = "${0.toChar()}.shstrtab${0.toChar()}.text${0.toChar()}.symtab${0.toChar()}".toByteArray()
 
-    lateinit var blocks_register_binary: ByteBuffer
+    private lateinit var blocks_register_binary: ByteBuffer
+    private lateinit var blocks_names_binary: ByteBuffer
 
 
 
@@ -36,33 +38,8 @@ object PackerELF64 : APacker() {
             size
         ).toByteArray()
         val text_section_header_bin = DELF64SectionHeader.forText(size).toByteArray()
-        val shstrtab_data = byteArrayOf(
-            0,
-            '.'.code.toByte(), // 1
-            's'.code.toByte(),
-            'h'.code.toByte(),
-            's'.code.toByte(),
-            't'.code.toByte(),
-            'r'.code.toByte(),
-            't'.code.toByte(),
-            'a'.code.toByte(),
-            'b'.code.toByte(),
-            0,
-            '.'.code.toByte(), // 11
-            't'.code.toByte(),
-            'e'.code.toByte(),
-            'x'.code.toByte(),
-            't'.code.toByte(),
-            0,
-            '.'.code.toByte(), // 17
-            's'.code.toByte(),
-            'y'.code.toByte(),
-            'm'.code.toByte(),
-            't'.code.toByte(),
-            'a'.code.toByte(),
-            'b'.code.toByte(),
-            0
-        )
+        val shstrtab_data = SH_STR_TAB_BASE_DATA_BIN +
+                blocks_names_binary.array()
 
         val shstrtab_section_header_bin = DELF64SectionHeader.forShStrTab(
             shstrtab_data.size.toLong()
@@ -105,20 +82,26 @@ object PackerELF64 : APacker() {
         return mapOf()
     }
 
-    override fun registerBlocks(target: MutableMap<String, Number>) {
-        blocks_register_binary = ByteBuffer.allocate(target.size * 24)
+    override fun registerBlocks(target: Map<String, Pair<Number, Number>>) {
+        blocks_register_binary = ByteBuffer.allocate(target.size * 24).order(ARCH.BYTE_ORDER.toJavaByteOrder())
+        var blocks_names = ""
 
-        for ( block in target ) {
+        for( (key, value) in target ) {
             blocks_register_binary.put(
                 DELF64Symbol(
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0
+                    name = SH_STR_TAB_BASE_DATA_BIN.size + blocks_names.length,
+                    info = encodeElfSymbolInfo(1, 2).toByte(), // function + global
+                    other = 0,
+                    section_index = TEXT_INDEX,
+                    value = value.first.toLong(),
+                    size = value.second.toLong()
                 ).toByteArray()
             )
+            blocks_names += key + 0.toChar()
         }
+
+        blocks_names_binary = ByteBuffer.allocate(blocks_names.length).order(ARCH.BYTE_ORDER.toJavaByteOrder())
+
+        blocks_names_binary.put(blocks_names.toByteArray())
     }
 }
