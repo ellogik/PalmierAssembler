@@ -9,19 +9,28 @@ import java.nio.ByteBuffer
 
 object PackerELF64 : APacker() {
     var num_of_phs: Short = 1
-    var num_of_shs: Short = 4
+    var num_of_shs: Short = 5
     lateinit var ARCH: AArchitecture
     lateinit var OS: AOperatingSystem
 
     const val HEADER_SIZE: Short = 64
     const val PROGRAM_HEADER_SIZE: Short = 56
     const val SECTION_HEADER_SIZE: Short = 64
-    const val SH_STR_TAB_INDEX: Short = 2
-    const val TEXT_INDEX: Short = 1
-    val SH_STR_TAB_BASE_DATA_BIN = "${0.toChar()}.shstrtab${0.toChar()}.text${0.toChar()}.symtab${0.toChar()}".toByteArray()
 
+    const val TEXT_INDEX: Short = 1
+    const val SH_STR_TAB_INDEX: Short = 2
+    const val STR_TAB_INDEX: Short = 4
+
+    const val TEXT_NAME_INDEX = 11
+    const val SH_STR_TAB_NAME_INDEX = 1
+    const val SYMTAB_NAME_INDEX = 17
+    const val STR_TAB_NAME_INDEX = 25
+
+    private val SH_STR_TAB_BASE_DATA_BIN = "${0.toChar()}.shstrtab${0.toChar()}.text${0.toChar()}.symtab${0.toChar()}.strtab".toByteArray()
     private lateinit var blocks_register_binary: ByteBuffer
     private lateinit var blocks_names_binary: ByteBuffer
+
+    private var blocks_names = "" + 0.toChar()
 
 
 
@@ -38,8 +47,7 @@ object PackerELF64 : APacker() {
             size
         ).toByteArray()
         val text_section_header_bin = DELF64SectionHeader.forText(size).toByteArray()
-        val shstrtab_data = SH_STR_TAB_BASE_DATA_BIN +
-                blocks_names_binary.array()
+        val shstrtab_data = SH_STR_TAB_BASE_DATA_BIN
 
         val shstrtab_section_header_bin = DELF64SectionHeader.forShStrTab(
             shstrtab_data.size.toLong()
@@ -53,7 +61,7 @@ object PackerELF64 : APacker() {
             value = 0,
             size = 0
         ).toByteArray() + DELF64Symbol(
-            name = 11,
+            name = blocks_names.length + TEXT_NAME_INDEX,
             info = 0x3,
             other = 0,
             section_index = TEXT_INDEX,
@@ -62,6 +70,9 @@ object PackerELF64 : APacker() {
         ).toByteArray() + blocks_register_binary.array()
 
         val symtab_section_header_bin = DELF64SectionHeader.forSymTab(symtab_section_data.size.toLong()).toByteArray()
+
+        val strtab_section_header_bin = DELF64SectionHeader.forStrTab(blocks_names_binary.array().size.toLong()).toByteArray()
+
         val obj = header_bin +
                 text_program_header_bin +
 
@@ -69,10 +80,12 @@ object PackerELF64 : APacker() {
                 text_section_header_bin +
                 shstrtab_section_header_bin +
                 symtab_section_header_bin +
+                strtab_section_header_bin +
 
                 executable_code.map { it.toByte() } +
                 shstrtab_data +
-                symtab_section_data
+                symtab_section_data +
+                blocks_names_binary.array()
 
 
         return obj
@@ -84,12 +97,11 @@ object PackerELF64 : APacker() {
 
     override fun registerBlocks(target: Map<String, Pair<Number, Number>>) {
         blocks_register_binary = ByteBuffer.allocate(target.size * 24).order(ARCH.BYTE_ORDER.toJavaByteOrder())
-        var blocks_names = ""
 
         for( (key, value) in target ) {
             blocks_register_binary.put(
                 DELF64Symbol(
-                    name = SH_STR_TAB_BASE_DATA_BIN.size + blocks_names.length,
+                    name = blocks_names.length,
                     info = encodeElfSymbolInfo(1, 2).toByte(), // function + global
                     other = 0,
                     section_index = TEXT_INDEX,
@@ -100,8 +112,10 @@ object PackerELF64 : APacker() {
             blocks_names += key + 0.toChar()
         }
 
-        blocks_names_binary = ByteBuffer.allocate(blocks_names.length).order(ARCH.BYTE_ORDER.toJavaByteOrder())
+        blocks_names_binary = ByteBuffer.allocate(blocks_names.length + SH_STR_TAB_BASE_DATA_BIN.size).order(ARCH.BYTE_ORDER.toJavaByteOrder())
 
-        blocks_names_binary.put(blocks_names.toByteArray())
+        blocks_names_binary
+            .put(blocks_names.toByteArray())
+            .put(SH_STR_TAB_BASE_DATA_BIN)
     }
 }

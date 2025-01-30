@@ -6,6 +6,11 @@ import packing.elf.elf64.PackerELF64.HEADER_SIZE
 import packing.elf.elf64.PackerELF64.PROGRAM_HEADER_SIZE
 import packing.elf.elf64.PackerELF64.SECTION_HEADER_SIZE
 import packing.elf.elf64.PackerELF64.SH_STR_TAB_INDEX
+import packing.elf.elf64.PackerELF64.SH_STR_TAB_NAME_INDEX
+import packing.elf.elf64.PackerELF64.STR_TAB_INDEX
+import packing.elf.elf64.PackerELF64.STR_TAB_NAME_INDEX
+import packing.elf.elf64.PackerELF64.SYMTAB_NAME_INDEX
+import packing.elf.elf64.PackerELF64.TEXT_NAME_INDEX
 import java.nio.ByteBuffer
 
 data class DELF64SectionHeader(
@@ -24,12 +29,13 @@ data class DELF64SectionHeader(
         private var DOT_TEXT_SIZE: Long? = null
         private var DOT_SH_STR_TAB_SIZE: Long? = null
         private var DOT_SYM_TAB_SIZE: Long? = null
+        private var DOT_STR_TAB_SIZE: Long? = null
 
         fun forText(size: Long): DELF64SectionHeader {
             DOT_TEXT_SIZE = size
 
             return DELF64SectionHeader(
-                name = 11, //.text
+                name = TEXT_NAME_INDEX, //.text
                 type = 1, // progbits
                 flags = 0x6, // SHF_ALLOC | SHF_EXECINSTR
                 address = (ARCH as IELFSupportInArch).ELF_ENTRY,
@@ -63,7 +69,7 @@ data class DELF64SectionHeader(
             DOT_SH_STR_TAB_SIZE = size
 
             return DELF64SectionHeader(
-                name = 1, //.shstrtab
+                name = SH_STR_TAB_NAME_INDEX, //.shstrtab
                 type = 0x3, // SHT_STRTAB
                 flags = 0x20,
                 address = 0,
@@ -82,7 +88,7 @@ data class DELF64SectionHeader(
             DOT_SYM_TAB_SIZE = size
 
             return DELF64SectionHeader(
-                name = 17, // .symtab
+                name = SYMTAB_NAME_INDEX, // .symtab
                 type = 2, // symtab
                 flags = 0,
                 address = 0,
@@ -90,10 +96,29 @@ data class DELF64SectionHeader(
                         (PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs) +
                         (SECTION_HEADER_SIZE * PackerELF64.num_of_shs) + DOT_TEXT_SIZE!! + DOT_SH_STR_TAB_SIZE!!,
                 size = size,
-                link = SH_STR_TAB_INDEX.toInt(),
+                link = STR_TAB_INDEX.toInt(),
                 info = (size / 24).toInt(),
                 address_align = 8,
                 entry_size = 24
+            )
+        }
+
+        fun forStrTab(size: Long): DELF64SectionHeader {
+            DOT_STR_TAB_SIZE = size
+
+            return DELF64SectionHeader(
+                name = STR_TAB_NAME_INDEX,
+                type = 0x3, // strtab
+                flags = 0x20,
+                address = 0,
+                offset =  HEADER_SIZE +
+                        (PROGRAM_HEADER_SIZE * PackerELF64.num_of_phs) +
+                        (SECTION_HEADER_SIZE * PackerELF64.num_of_shs) + DOT_TEXT_SIZE!! + DOT_SH_STR_TAB_SIZE!! + DOT_SYM_TAB_SIZE!!,
+                size = size,
+                link = 0,
+                info = 0,
+                address_align = 2,
+                entry_size = 0
             )
         }
     }
